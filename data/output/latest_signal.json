@@ -1,0 +1,37 @@
+{
+  "schema_version": "1",
+  "as_of": "2026-05-28",
+  "generated_at": "2026-05-28T14:38:47.474891Z",
+  "mode": "shadow",
+  "horizon": "1-3 months",
+  "universe": ["SPY", "QQQ", "SOXX", "TQQQ", "BIL", "BOXX"],
+  "regime": "mixed",
+  "risk_flags": [
+    "price_only_context",
+    "semiconductor_and_leveraged_etf_high_volatility",
+    "no_point_in_time_replay_evidence"
+  ],
+  "candidate_bias": {
+    "SPY": "positive",
+    "QQQ": "positive",
+    "SOXX": "watch",
+    "TQQQ": "avoid",
+    "BIL": "neutral",
+    "BOXX": "neutral"
+  },
+  "confidence": 0.58,
+  "evidence": {
+    "sources": [".codex-audit/monthly_issue.md"],
+    "summary": "The 2026-05-28 point-in-time context shows SPY, QQQ, SOXX, and TQQQ above their 200-day averages with positive short- and medium-term returns. QQQ and SPY volatility are normal, while SOXX and TQQQ show high realized volatility, so the shadow regime is mixed rather than an execution signal.",
+    "data_gaps": [
+      "No replay or backtest evidence is attached for this specific artifact.",
+      "Context is primarily price, trend, and volatility data; macro, valuation, and event risks were not independently verified.",
+      "Historical AI judgments must come from saved artifacts, not regenerated prompts."
+    ]
+  },
+  "expires_at": "2026-06-28",
+  "policy": {
+    "execution_allowed": false,
+    "downstream_use": "Research-only shadow context. Execution, allocation changes, and order generation are blocked unless a separate deterministic policy engine explicitly consumes this artifact under its own controls."
+  }
+}
