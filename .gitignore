@@ -1,0 +1,12 @@
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.pyc
+
+# Keep local/private research inputs out of git by default.
+data/input/*
+!data/input/.gitkeep
+
+# Generated shadow outputs may be checked in only when intentionally promoted.
+data/output/tmp/

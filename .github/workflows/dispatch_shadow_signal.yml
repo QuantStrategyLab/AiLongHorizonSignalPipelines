@@ -1,0 +1,145 @@
+name: Long Horizon Shadow Signal
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Bridge provider"
+        required: false
+        type: choice
+        default: "auto"
+        options:
+          - auto
+          - api
+          - anthropic
+          - codex
+          - openai
+      source_ref:
+        description: "Ref to pass to CodexAuditBridge"
+        required: false
+        default: "main"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  dispatch-shadow-signal:
+    runs-on: ubuntu-latest
+    env:
+      BRIDGE_REPOSITORY: ${{ vars.SELFHOSTED_CODEX_REVIEW_REPOSITORY || 'QuantStrategyLab/CodexAuditBridge' }}
+      BRIDGE_TASK: long_horizon_signal_shadow
+      BRIDGE_PROVIDER: ${{ inputs.provider || 'auto' }}
+      SOURCE_REF: ${{ inputs.source_ref || 'main' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Validate existing latest signal if present
+        run: python scripts/validate_latest_signal.py --allow-missing
+
+      - name: Detect GitHub App Credentials
+        id: app_credentials
+        env:
+          APP_ID: ${{ vars.CROSS_REPO_GITHUB_APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.CROSS_REPO_GITHUB_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "${APP_ID:-}" ] && [ -n "${APP_PRIVATE_KEY:-}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub App Token For Bridge Repository
+        id: bridge_app_token
+        if: steps.app_credentials.outputs.available == 'true'
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.CROSS_REPO_GITHUB_APP_ID }}
+          private-key: ${{ secrets.CROSS_REPO_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            CodexAuditBridge
+          permission-actions: write
+
+      - name: Create shadow signal issue and dispatch bridge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_TOKEN: ${{ steps.bridge_app_token.outputs.token }}
+          CODEX_AUDIT_DISPATCH_TOKEN: ${{ secrets.CODEX_AUDIT_DISPATCH_TOKEN }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+          import urllib.error
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          bridge_repo = os.environ["BRIDGE_REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+          dispatch_token = os.environ.get("APP_TOKEN") or os.environ.get("CODEX_AUDIT_DISPATCH_TOKEN")
+          if not dispatch_token:
+              raise SystemExit("Bridge dispatch requires a GitHub App token or CODEX_AUDIT_DISPATCH_TOKEN")
+
+          def request(method, url, payload=None, auth_token=token):
+              data = json.dumps(payload).encode("utf-8") if payload is not None else None
+              req = urllib.request.Request(
+                  url,
+                  data=data,
+                  method=method,
+                  headers={
+                      "Authorization": f"Bearer {auth_token}",
+                      "Accept": "application/vnd.github+json",
+                      "Content-Type": "application/json",
+                  },
+              )
+              with urllib.request.urlopen(req, timeout=60) as response:
+                  body = response.read().decode("utf-8")
+                  return response.status, json.loads(body) if body else None
+
+          issue_body = "\n".join([
+              "## Long-Horizon Shadow Signal Request",
+              "",
+              f"- Source ref: `{os.environ['SOURCE_REF']}`",
+              "- Mode: `shadow`",
+              "- Required output: `data/output/latest_signal.json`",
+              "- AI output must not place orders or change live strategy rules.",
+              "",
+              "## Context",
+              "",
+              "Use repository examples and any committed context bundles as evidence.",
+              "If evidence is insufficient, report findings and do not edit artifacts.",
+          ])
+          _, issue = request(
+              "POST",
+              f"https://api.github.com/repos/{repo}/issues",
+              {"title": "Long-horizon AI shadow signal review", "body": issue_body},
+          )
+
+          dispatch_payload = {
+              "ref": "main",
+              "inputs": {
+                  "source_repo": repo,
+                  "issue_number": str(issue["number"]),
+                  "source_ref": os.environ["SOURCE_REF"],
+                  "mode": "review_and_fix",
+                  "provider": os.environ["BRIDGE_PROVIDER"],
+                  "task": os.environ["BRIDGE_TASK"],
+                  "auto_merge": "false",
+              },
+          }
+          status, _ = request(
+              "POST",
+              f"https://api.github.com/repos/{bridge_repo}/actions/workflows/selfhosted_monthly_review.yml/dispatches",
+              dispatch_payload,
+              auth_token=dispatch_token,
+          )
+          if status not in (201, 204):
+              raise RuntimeError(f"unexpected dispatch status: {status}")
+          print(f"Created issue #{issue['number']} and dispatched {bridge_repo}")
+          PY
