@@ -28,14 +28,17 @@ This repo does not own:
 
 ## Operating Model
 
-1. A weekly workflow creates or updates a dated long-horizon shadow-signal issue.
-2. The issue is dispatched to `QuantStrategyLab/CodexAuditBridge` with task
+1. A weekly workflow builds a point-in-time context bundle from current market
+   prices.
+2. The workflow creates or updates a dated long-horizon shadow-signal issue and
+   embeds the context bundle as review evidence.
+3. The issue is dispatched to `QuantStrategyLab/CodexAuditBridge` with task
    `long_horizon_signal_shadow`.
-3. `CodexAuditBridge` tries self-hosted Codex first and uses its own OpenAI or
+4. `CodexAuditBridge` tries self-hosted Codex first and uses its own OpenAI or
    Anthropic API fallback only when configured.
-4. Any AI-generated artifact must remain `mode=shadow` and pass local schema
+5. Any AI-generated artifact must remain `mode=shadow` and pass local schema
    validation.
-5. Downstream runtimes must treat the artifact as advisory context only until a
+6. Downstream runtimes must treat the artifact as advisory context only until a
    separate deterministic policy engine explicitly consumes it.
 
 ## GitHub Configuration
@@ -75,6 +78,21 @@ Validate the example artifact:
 ```bash
 python scripts/validate_latest_signal.py examples/latest_signal.example.json
 ```
+
+Build a context bundle from a local price file:
+
+```bash
+python scripts/build_context_bundle.py \
+  --prices examples/price_history.example.csv \
+  --symbols QQQ \
+  --output data/output/context_bundle/latest_context_bundle.json
+```
+
+Without `--prices`, the script downloads recent daily prices for the default
+universe through Yahoo's chart endpoint and writes a point-in-time context bundle
+for the weekly shadow issue. The scheduled workflow uses
+`--allow-download-errors`, so external data-source failures still create an
+operator issue with the failure recorded instead of silently skipping the run.
 
 Validate the promoted latest artifact when it exists:
 

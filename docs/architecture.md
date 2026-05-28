@@ -19,6 +19,9 @@ order routing.
 - `CodexAuditBridge` owns provider routing and API keys.
 - GitHub Issues are the first operator notification layer for scheduled shadow
   signal runs.
+- The scheduled workflow builds the market context bundle before dispatching the
+  bridge and embeds that bundle into the issue, because the bridge reads the
+  source repository ref plus issue content.
 - `QuantStrategyPlugins` may later read promoted artifacts as sidecar context.
 - Platform repositories remain unchanged.
 
