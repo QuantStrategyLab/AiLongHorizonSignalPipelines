@@ -2,9 +2,9 @@ name: Long Horizon Shadow Signal
 
 on:
   schedule:
-    # Weekly after Friday US market close. This remains shadow-only and does not
-    # place trades.
-    - cron: "30 2 * * 6"
+    # Monthly shadow research run. This remains shadow-only and does not place
+    # trades.
+    - cron: "30 2 1 * *"
   workflow_dispatch:
     inputs:
       provider:

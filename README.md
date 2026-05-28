@@ -54,7 +54,7 @@ point-in-time artifact is `data/output/signal_history/2026-05-28.json`.
 
 Near-term work should focus on:
 
-- keeping the weekly workflow healthy
+- keeping the monthly workflow healthy
 - accumulating saved `signal_history/*.json` artifacts
 - replaying only saved artifacts, not regenerated historical AI judgments
 - improving context quality before any downstream plugin integration
@@ -65,7 +65,7 @@ plugin contract.
 
 ## Operating Model
 
-1. A weekly workflow builds a point-in-time context bundle from current market
+1. A monthly workflow builds a point-in-time context bundle from current market
    prices.
 2. The workflow creates or updates a dated long-horizon shadow-signal issue and
    embeds the context bundle as review evidence.
@@ -127,7 +127,7 @@ python scripts/build_context_bundle.py \
 
 Without `--prices`, the script downloads recent daily prices for the default
 universe through Yahoo's chart endpoint and writes a point-in-time context bundle
-for the weekly shadow issue. The scheduled workflow uses
+for the monthly shadow issue. The scheduled workflow uses
 `--allow-download-errors`, so external data-source failures still create an
 operator issue with the failure recorded instead of silently skipping the run.
 
