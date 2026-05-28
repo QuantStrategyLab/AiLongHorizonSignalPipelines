@@ -1,5 +1,7 @@
 # AiLongHorizonSignalPipelines
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Research-only long-horizon AI signal artifact repository for QuantStrategyLab.
 
 This repository does not place trades, store broker credentials, or own live
@@ -200,3 +202,7 @@ conservative:
 - `mixed`: reduce exposure to `0.8`
 - severe risk flags such as `liquidity_stress` cap exposure at `0.6`
 - the overlay never increases exposure above the baseline
+
+## License
+
+This repository is licensed under the MIT License. See [LICENSE](LICENSE).
