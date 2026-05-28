@@ -38,6 +38,25 @@ This repo does not own:
 5. Downstream runtimes must treat the artifact as advisory context only until a
    separate deterministic policy engine explicitly consumes it.
 
+## GitHub Configuration
+
+The model API keys are centralized in `CodexAuditBridge`; do not add
+`OPENAI_API_KEY` or `ANTHROPIC_API_KEY` to this repository.
+
+This repository needs only dispatch credentials for the bridge workflow:
+
+- preferred: `CROSS_REPO_GITHUB_APP_ID` variable and
+  `CROSS_REPO_GITHUB_APP_PRIVATE_KEY` secret with Actions write permission on
+  `CodexAuditBridge`
+- fallback: `CODEX_AUDIT_DISPATCH_TOKEN` secret with permission to dispatch the
+  bridge workflow
+
+Configured non-secret variables:
+
+- `SELFHOSTED_CODEX_REVIEW_REPOSITORY=QuantStrategyLab/CodexAuditBridge`
+- `SELFHOSTED_CODEX_REVIEW_PROVIDER=auto`
+- `CROSS_REPO_GITHUB_APP_ID=3250578`
+
 ## Local Validation
 
 Validate the example artifact:
