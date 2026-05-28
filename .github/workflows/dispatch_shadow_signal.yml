@@ -1,6 +1,10 @@
 name: Long Horizon Shadow Signal
 
 on:
+  schedule:
+    # Weekly after Friday US market close. This remains shadow-only and does not
+    # place trades.
+    - cron: "30 2 * * 6"
   workflow_dispatch:
     inputs:
       provider:
@@ -29,8 +33,9 @@ jobs:
     env:
       BRIDGE_REPOSITORY: ${{ vars.SELFHOSTED_CODEX_REVIEW_REPOSITORY || 'QuantStrategyLab/CodexAuditBridge' }}
       BRIDGE_TASK: long_horizon_signal_shadow
-      BRIDGE_PROVIDER: ${{ inputs.provider || 'auto' }}
-      SOURCE_REF: ${{ inputs.source_ref || 'main' }}
+      BRIDGE_PROVIDER: ${{ github.event.inputs.provider || 'auto' }}
+      SOURCE_REF: ${{ github.event.inputs.source_ref || 'main' }}
+      SHADOW_SIGNAL_LABEL: long-horizon-shadow
     steps:
       - uses: actions/checkout@v6
 
@@ -40,6 +45,31 @@ jobs:
 
       - name: Validate existing latest signal if present
         run: python scripts/validate_latest_signal.py --allow-missing
+
+      - name: Create or update shadow signal issue
+        id: shadow_issue
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/post_shadow_signal_request.py \
+            --repo "${GITHUB_REPOSITORY}" \
+            --source-ref "${SOURCE_REF}" \
+            --provider "${BRIDGE_PROVIDER}" \
+            --bridge-repository "${BRIDGE_REPOSITORY}" \
+            --label "${SHADOW_SIGNAL_LABEL}"
+
+      - name: Append shadow signal job summary
+        run: |
+          {
+            echo "## Long-horizon shadow signal"
+            echo ""
+            echo "- Issue: [${{ steps.shadow_issue.outputs.issue_title }}](${{ steps.shadow_issue.outputs.issue_url }})"
+            echo "- Issue action: \`${{ steps.shadow_issue.outputs.issue_action }}\`"
+            echo "- Source ref: \`${SOURCE_REF}\`"
+            echo "- Provider: \`${BRIDGE_PROVIDER}\`"
+            echo "- Bridge: \`${BRIDGE_REPOSITORY}\`"
+            echo "- Mode: \`shadow\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Detect GitHub App Credentials
         id: app_credentials
@@ -72,6 +102,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           APP_TOKEN: ${{ steps.bridge_app_token.outputs.token }}
           CODEX_AUDIT_DISPATCH_TOKEN: ${{ secrets.CODEX_AUDIT_DISPATCH_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.shadow_issue.outputs.issue_number }}
         run: |
           python - <<'PY'
           import json
@@ -102,30 +133,11 @@ jobs:
                   body = response.read().decode("utf-8")
                   return response.status, json.loads(body) if body else None
 
-          issue_body = "\n".join([
-              "## Long-Horizon Shadow Signal Request",
-              "",
-              f"- Source ref: `{os.environ['SOURCE_REF']}`",
-              "- Mode: `shadow`",
-              "- Required output: `data/output/latest_signal.json`",
-              "- AI output must not place orders or change live strategy rules.",
-              "",
-              "## Context",
-              "",
-              "Use repository examples and any committed context bundles as evidence.",
-              "If evidence is insufficient, report findings and do not edit artifacts.",
-          ])
-          _, issue = request(
-              "POST",
-              f"https://api.github.com/repos/{repo}/issues",
-              {"title": "Long-horizon AI shadow signal review", "body": issue_body},
-          )
-
           dispatch_payload = {
               "ref": "main",
               "inputs": {
                   "source_repo": repo,
-                  "issue_number": str(issue["number"]),
+                  "issue_number": os.environ["ISSUE_NUMBER"],
                   "source_ref": os.environ["SOURCE_REF"],
                   "mode": "review_and_fix",
                   "provider": os.environ["BRIDGE_PROVIDER"],
@@ -141,5 +153,5 @@ jobs:
           )
           if status not in (201, 204):
               raise RuntimeError(f"unexpected dispatch status: {status}")
-          print(f"Created issue #{issue['number']} and dispatched {bridge_repo}")
+          print(f"Dispatched {bridge_repo} for issue #{os.environ['ISSUE_NUMBER']}")
           PY

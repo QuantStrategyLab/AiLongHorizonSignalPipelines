@@ -28,7 +28,7 @@ This repo does not own:
 
 ## Operating Model
 
-1. A workflow creates a long-horizon shadow-signal issue.
+1. A weekly workflow creates or updates a dated long-horizon shadow-signal issue.
 2. The issue is dispatched to `QuantStrategyLab/CodexAuditBridge` with task
    `long_horizon_signal_shadow`.
 3. `CodexAuditBridge` tries self-hosted Codex first and uses its own OpenAI or
@@ -56,6 +56,17 @@ Configured non-secret variables:
 - `SELFHOSTED_CODEX_REVIEW_REPOSITORY=QuantStrategyLab/CodexAuditBridge`
 - `SELFHOSTED_CODEX_REVIEW_PROVIDER=auto`
 - `CROSS_REPO_GITHUB_APP_ID=3250578`
+
+## Notification Policy
+
+The GitHub issue created by `.github/workflows/dispatch_shadow_signal.yml` is the
+initial operator notification channel. It is labeled `long-horizon-shadow`,
+deduplicated by date, and receives the CodexAuditBridge result as comments or a
+focused PR.
+
+Do not add Telegram, broker, or runtime plugin notifications at this stage. Those
+belong downstream only after the signal graduates from shadow research to a
+deterministic plugin contract.
 
 ## Local Validation
 
