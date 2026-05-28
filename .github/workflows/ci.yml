@@ -21,3 +21,9 @@ jobs:
         run: python scripts/validate_latest_signal.py examples/latest_signal.example.json
       - name: Run example overlay replay
         run: python scripts/backtest_signal_overlay.py --prices examples/price_history.example.csv --signals examples/signal_history --symbol QQQ
+      - name: Run example price extraction
+        run: |
+          python scripts/extract_price_history.py \
+            --source examples/price_history.example.csv \
+            --target /tmp/qqq_overlay_prices.csv \
+            --symbols QQQ

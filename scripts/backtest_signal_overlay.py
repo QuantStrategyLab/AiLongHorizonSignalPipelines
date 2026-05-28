@@ -19,7 +19,11 @@ from ai_long_horizon_signal_pipelines.overlay_backtest import (  # noqa: E402
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Replay shadow AI signals as a deterministic risk overlay.")
-    parser.add_argument("--prices", default="examples/price_history.example.csv", help="CSV with date,symbol,close")
+    parser.add_argument(
+        "--prices",
+        default="examples/price_history.example.csv",
+        help="CSV with symbol,close and date or as_of",
+    )
     parser.add_argument("--signals", default="examples/signal_history", help="Signal JSON file or directory")
     parser.add_argument("--symbol", default="QQQ", help="Risk asset symbol to test")
     parser.add_argument("--min-confidence", type=float, default=0.55)

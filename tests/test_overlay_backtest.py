@@ -45,3 +45,24 @@ def test_backtest_overlay_reduces_drawdown_on_synthetic_path() -> None:
     assert summary["overlay"]["max_drawdown"] > summary["baseline"]["max_drawdown"]
     assert 0 < summary["overlay"]["avg_exposure"] <= 1.0
     assert summary["overlay"]["turnover"] > 0
+
+
+def test_load_price_history_accepts_quant_strategy_as_of_schema(tmp_path) -> None:
+    prices_path = tmp_path / "prices.csv"
+    prices_path.write_text(
+        "\n".join(
+            [
+                "symbol,as_of,close,volume",
+                "QQQ,2026-01-02,100,1000",
+                "SPY,2026-01-02,90,1000",
+                "QQQ,2026-01-05,101,1000",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    prices = load_price_history(prices_path, symbol="QQQ")
+
+    assert [price.date.isoformat() for price in prices] == ["2026-01-02", "2026-01-05"]
+    assert [price.close for price in prices] == [100.0, 101.0]
