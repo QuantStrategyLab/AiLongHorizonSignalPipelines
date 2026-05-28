@@ -6,6 +6,11 @@ QuantStrategyLab already separates strategy math, snapshot generation, runtime
 execution, and broker adapters. This repository adds a research-only AI signal
 pipeline without changing that production boundary.
 
+This repository is deliberately narrower than `CodexAuditBridge`. It owns
+research inputs, validation, saved artifacts, and replay harnesses. It does not
+own model provider routing, API keys, GitHub App write orchestration, live
+notifications, or execution behavior.
+
 ## Main Design Pressure
 
 LLM output is not naturally deterministic or backtestable. The repository must
@@ -15,7 +20,7 @@ order routing.
 ## Recommended Low-Risk Shape
 
 - `AiLongHorizonSignalPipelines` stores context examples, schema, validation,
-  and shadow artifacts.
+  replay tooling, and shadow artifacts.
 - `CodexAuditBridge` owns provider routing and API keys.
 - GitHub Issues are the first operator notification layer for scheduled shadow
   signal runs.
@@ -24,6 +29,18 @@ order routing.
   source repository ref plus issue content.
 - `QuantStrategyPlugins` may later read promoted artifacts as sidecar context.
 - Platform repositories remain unchanged.
+
+## Lifecycle
+
+The current lifecycle is accumulation-first:
+
+1. Build a point-in-time context bundle.
+2. Ask `CodexAuditBridge` to review it and produce a shadow-only artifact when
+   evidence is sufficient.
+3. Save both `latest_signal.json` and dated `signal_history/YYYY-MM-DD.json`.
+4. Replay only saved artifacts against later prices.
+5. Consider a deterministic plugin only after enough walk-forward evidence
+   exists.
 
 ## Not Recommended
 
@@ -35,6 +52,8 @@ order routing.
   artifacts.
 - Sending runtime Telegram or broker-facing notifications directly from this
   research repository before a deterministic plugin contract exists.
+- Duplicating `CodexAuditBridge` provider fallback or cross-repository write
+  logic inside this repository.
 
 ## Validation Strategy
 
