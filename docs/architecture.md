@@ -17,6 +17,8 @@ order routing.
 - `AiLongHorizonSignalPipelines` stores context examples, schema, validation,
   and shadow artifacts.
 - `CodexAuditBridge` owns provider routing and API keys.
+- GitHub Issues are the first operator notification layer for scheduled shadow
+  signal runs.
 - `QuantStrategyPlugins` may later read promoted artifacts as sidecar context.
 - Platform repositories remain unchanged.
 
@@ -28,6 +30,8 @@ order routing.
   execution mode.
 - Re-generating old AI judgments during replay instead of replaying stored
   artifacts.
+- Sending runtime Telegram or broker-facing notifications directly from this
+  research repository before a deterministic plugin contract exists.
 
 ## Validation Strategy
 
