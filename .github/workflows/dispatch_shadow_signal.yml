@@ -46,6 +46,12 @@ jobs:
       - name: Validate existing latest signal if present
         run: python scripts/validate_latest_signal.py --allow-missing
 
+      - name: Build point-in-time context bundle
+        run: |
+          python scripts/build_context_bundle.py \
+            --output data/output/context_bundle/latest_context_bundle.json \
+            --allow-download-errors
+
       - name: Create or update shadow signal issue
         id: shadow_issue
         env:
@@ -56,6 +62,7 @@ jobs:
             --source-ref "${SOURCE_REF}" \
             --provider "${BRIDGE_PROVIDER}" \
             --bridge-repository "${BRIDGE_REPOSITORY}" \
+            --context-file data/output/context_bundle/latest_context_bundle.json \
             --label "${SHADOW_SIGNAL_LABEL}"
 
       - name: Append shadow signal job summary
@@ -155,3 +162,9 @@ jobs:
               raise RuntimeError(f"unexpected dispatch status: {status}")
           print(f"Dispatched {bridge_repo} for issue #{os.environ['ISSUE_NUMBER']}")
           PY
+
+      - name: Upload context bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: long-horizon-context-bundle
+          path: data/output/context_bundle/latest_context_bundle.json

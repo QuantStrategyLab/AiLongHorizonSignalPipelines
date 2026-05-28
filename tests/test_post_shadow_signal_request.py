@@ -11,12 +11,20 @@ def test_build_issue_body_marks_notification_and_shadow_boundary() -> None:
         source_ref="main",
         provider="auto",
         bridge_repository="QuantStrategyLab/CodexAuditBridge",
+        context_bundle={"as_of": "2026-05-29", "price_context": {"QQQ": {"trend": "above_200d"}}},
     )
 
     assert "operator-facing notification" in body
     assert "Mode: `shadow`" in body
     assert "must not place orders" in body
     assert "Do not infer historical AI signals" in body
+    assert "Context Bundle" in body
+    assert '"QQQ"' in body
+
+
+def test_resolve_as_of_date_prefers_context_bundle() -> None:
+    assert shadow_issue.resolve_as_of_date(None, {"as_of": "2026-05-29"}) == "2026-05-29"
+    assert shadow_issue.resolve_as_of_date("2026-05-28", {"as_of": "2026-05-29"}) == "2026-05-28"
 
 
 def test_upsert_issue_updates_existing_issue(monkeypatch) -> None:

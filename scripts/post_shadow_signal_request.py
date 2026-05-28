@@ -5,6 +5,7 @@ import argparse
 import datetime as dt
 import json
 import os
+from pathlib import Path
 import sys
 import urllib.error
 import urllib.parse
@@ -67,8 +68,53 @@ def build_issue_title(as_of_date: str) -> str:
     return f"Long-horizon AI shadow signal: {as_of_date}"
 
 
-def build_issue_body(*, as_of_date: str, source_ref: str, provider: str, bridge_repository: str) -> str:
+def load_context_bundle(path: str | None) -> dict[str, Any] | None:
+    if not path:
+        return None
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def resolve_as_of_date(raw_as_of_date: str | None, context_bundle: Mapping[str, Any] | None) -> str:
+    if raw_as_of_date:
+        return raw_as_of_date
+    if context_bundle and str(context_bundle.get("as_of") or "").strip():
+        return str(context_bundle["as_of"]).strip()
+    return dt.date.today().isoformat()
+
+
+def context_markdown(context_bundle: Mapping[str, Any] | None) -> str:
+    if not context_bundle:
+        return "\n".join(
+            [
+                "## Context",
+                "",
+                "No generated context bundle was attached to this request.",
+                "If evidence is insufficient, report findings and leave artifacts unchanged.",
+            ]
+        )
+    context_json = json.dumps(context_bundle, ensure_ascii=True, indent=2, sort_keys=True)
     return "\n".join(
+        [
+            "## Context Bundle",
+            "",
+            "Use this point-in-time context bundle as the primary evidence for the shadow signal review.",
+            "",
+            "```json",
+            context_json,
+            "```",
+        ]
+    )
+
+
+def build_issue_body(
+    *,
+    as_of_date: str,
+    source_ref: str,
+    provider: str,
+    bridge_repository: str,
+    context_bundle: Mapping[str, Any] | None = None,
+) -> str:
+    sections = [
         [
             "## Long-Horizon Shadow Signal Request",
             "",
@@ -92,12 +138,14 @@ def build_issue_body(*, as_of_date: str, source_ref: str, provider: str, bridge_
             "- Any downstream use must remain advisory until a deterministic policy consumes the artifact.",
             "- If evidence is insufficient, report findings and leave artifacts unchanged.",
             "",
-            "## Context",
+        ],
+        [context_markdown(context_bundle)],
+        [
             "",
-            "Use committed examples, context bundles, and existing shadow artifacts as evidence.",
             "Do not infer historical AI signals that were not generated point-in-time.",
-        ]
-    )
+        ],
+    ]
+    return "\n".join(line for section in sections for line in section)
 
 
 def upsert_issue(
@@ -125,7 +173,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-ref", default="main")
     parser.add_argument("--provider", default="auto")
     parser.add_argument("--bridge-repository", default="QuantStrategyLab/CodexAuditBridge")
-    parser.add_argument("--as-of-date", default=dt.date.today().isoformat())
+    parser.add_argument("--as-of-date")
+    parser.add_argument("--context-file", help="Optional JSON context bundle to embed in the issue body")
     parser.add_argument("--label", default=DEFAULT_LABEL)
     parser.add_argument("--api-url", default=DEFAULT_API_URL)
     return parser.parse_args()
@@ -152,12 +201,15 @@ def main() -> int:
         print("GITHUB_TOKEN is required", file=sys.stderr)
         return 1
 
-    title = build_issue_title(args.as_of_date)
+    context_bundle = load_context_bundle(args.context_file)
+    as_of_date = resolve_as_of_date(args.as_of_date, context_bundle)
+    title = build_issue_title(as_of_date)
     body = build_issue_body(
-        as_of_date=args.as_of_date,
+        as_of_date=as_of_date,
         source_ref=args.source_ref,
         provider=args.provider,
         bridge_repository=args.bridge_repository,
+        context_bundle=context_bundle,
     )
     try:
         action, issue_number, issue_url = upsert_issue(

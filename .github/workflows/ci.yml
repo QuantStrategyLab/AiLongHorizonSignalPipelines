@@ -27,3 +27,9 @@ jobs:
             --source examples/price_history.example.csv \
             --target /tmp/qqq_overlay_prices.csv \
             --symbols QQQ
+      - name: Build example context bundle
+        run: |
+          python scripts/build_context_bundle.py \
+            --prices examples/price_history.example.csv \
+            --symbols QQQ \
+            --output /tmp/context_bundle.json
