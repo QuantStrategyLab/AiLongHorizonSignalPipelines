@@ -47,6 +47,11 @@ The first overlay harness intentionally measures only:
 This is enough to identify whether the stored AI context would have reduced
 risk or created unacceptable opportunity cost before any runtime integration.
 
+The replay harness can read either compact `date,symbol,close` CSV files or the
+existing QuantStrategyLab `symbol,as_of,close` price-history files. Large source
+files should stay in their owning strategy repositories or object storage; this
+repository only stores small extracted replay inputs when needed for research.
+
 ## Risk Notes
 
 The artifact is research evidence, not a trading instruction. Missing evidence,

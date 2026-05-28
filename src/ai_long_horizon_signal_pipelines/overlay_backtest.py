@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import csv
 import datetime as dt
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .price_history import parse_price_date, read_price_rows
 from .schema import validate_signal
 
 
@@ -33,25 +33,14 @@ class OverlayPolicy:
 
 
 def parse_date(value: str) -> dt.date:
-    return dt.date.fromisoformat(value)
+    return parse_price_date(value)
 
 
 def load_price_history(path: Path, *, symbol: str) -> list[PricePoint]:
-    rows: list[PricePoint] = []
-    with path.open(newline="", encoding="utf-8") as handle:
-        reader = csv.DictReader(handle)
-        required = {"date", "symbol", "close"}
-        missing = required.difference(reader.fieldnames or ())
-        if missing:
-            raise ValueError(f"price history missing columns: {', '.join(sorted(missing))}")
-        for row in reader:
-            if str(row["symbol"]).strip().upper() != symbol.upper():
-                continue
-            close = float(row["close"])
-            if close <= 0:
-                raise ValueError(f"close must be positive for {symbol} on {row['date']}")
-            rows.append(PricePoint(date=parse_date(row["date"]), close=close))
-    rows.sort(key=lambda item: item.date)
+    rows = [
+        PricePoint(date=row.date, close=row.close)
+        for row in read_price_rows(path, symbols=[symbol])
+    ]
     if len(rows) < 2:
         raise ValueError(f"price history for {symbol} requires at least two rows")
     return rows

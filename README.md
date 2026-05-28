@@ -83,6 +83,28 @@ python scripts/backtest_signal_overlay.py \
 The replay tests a deterministic risk-reducing overlay only. It does not call
 AI models and does not treat the example as production evidence.
 
+Extract compact real-price input from an existing QuantStrategyLab price file:
+
+```bash
+python scripts/extract_price_history.py \
+  --source ../UsEquitySnapshotPipelines/data/output/tqqq_growth_income_real_full_archive_2026-05-26/price_history.csv \
+  --target data/input/qqq_price_history.csv \
+  --symbols QQQ
+```
+
+Then replay stored shadow signals against those prices:
+
+```bash
+python scripts/backtest_signal_overlay.py \
+  --prices data/input/qqq_price_history.csv \
+  --signals data/output/signal_history \
+  --symbol QQQ \
+  --output data/output/tmp/replay_summary.json
+```
+
+The price loader accepts both this repository's compact `date,symbol,close`
+schema and the existing QuantStrategyLab `symbol,as_of,close` schema.
+
 ## Artifact Contract
 
 The latest artifact path is:
