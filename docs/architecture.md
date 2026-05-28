@@ -31,9 +31,21 @@ order routing.
 
 ## Validation Strategy
 
-The current minimum check is schema validation for `latest_signal.json`. Future
-promotion should add replay tests that consume stored artifacts without calling
-model APIs.
+The current minimum checks are schema validation and deterministic overlay
+replay. Replay consumes stored signal artifacts from `signal_history` and maps
+them through a fixed risk-reducing policy. It must never ask a model to recreate
+old judgments.
+
+The first overlay harness intentionally measures only:
+
+- final equity
+- total return
+- maximum drawdown
+- average exposure
+- exposure turnover
+
+This is enough to identify whether the stored AI context would have reduced
+risk or created unacceptable opportunity cost before any runtime integration.
 
 ## Risk Notes
 
