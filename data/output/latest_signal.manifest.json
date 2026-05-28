@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "artifact": "data/output/latest_signal.json",
+  "history_artifact": "data/output/signal_history/2026-05-28.json",
+  "artifact_sha256": "d21c65ffbcc62386201ad2fe8139acaaf4b842e5019c9e768b3b7e2678e9ff31",
+  "as_of": "2026-05-28",
+  "generated_at": "2026-05-28T14:38:47.474891Z",
+  "mode": "shadow",
+  "source_issue": "https://github.com/QuantStrategyLab/AiLongHorizonSignalPipelines/issues/4",
+  "source_ref": "main",
+  "source_files": [
+    ".codex-audit/monthly_issue.md",
+    ".codex-audit/context.json"
+  ],
+  "validation": {
+    "commands": [
+      "python scripts/validate_latest_signal.py",
+      "python scripts/validate_latest_signal.py data/output/signal_history/2026-05-28.json"
+    ],
+    "status": "passed"
+  },
+  "policy": {
+    "execution_allowed": false,
+    "downstream_use": "Manifest only records provenance for a shadow research artifact; it does not authorize execution."
+  }
+}
