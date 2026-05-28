@@ -71,6 +71,18 @@ Validate the promoted latest artifact when it exists:
 python scripts/validate_latest_signal.py
 ```
 
+Run the synthetic overlay replay:
+
+```bash
+python scripts/backtest_signal_overlay.py \
+  --prices examples/price_history.example.csv \
+  --signals examples/signal_history \
+  --symbol QQQ
+```
+
+The replay tests a deterministic risk-reducing overlay only. It does not call
+AI models and does not treat the example as production evidence.
+
 ## Artifact Contract
 
 The latest artifact path is:
@@ -87,3 +99,16 @@ data/output/signal_history/YYYY-MM-DD.json
 
 All artifacts must remain shadow-only. They cannot encode broker orders, target
 quantities, or live allocation overrides.
+
+## Replay Contract
+
+Historical validation should replay stored signal artifacts instead of asking a
+model to re-create old judgments. The current example policy is intentionally
+conservative:
+
+- no active signal: keep baseline exposure
+- `confidence < 0.55`: no-op
+- `risk_off`: reduce exposure to `0.5`
+- `mixed`: reduce exposure to `0.8`
+- severe risk flags such as `liquidity_stress` cap exposure at `0.6`
+- the overlay never increases exposure above the baseline

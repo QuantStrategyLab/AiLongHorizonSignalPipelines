@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "as_of": "2026-02-06",
+  "generated_at": "2026-02-06T22:00:00Z",
+  "mode": "shadow",
+  "horizon": "1-3 months",
+  "universe": ["QQQ", "BIL", "BOXX"],
+  "regime": "risk_off",
+  "risk_flags": ["liquidity_stress"],
+  "candidate_bias": {
+    "QQQ": "avoid",
+    "BIL": "neutral",
+    "BOXX": "neutral"
+  },
+  "confidence": 0.8,
+  "evidence": {
+    "sources": ["examples/context_bundle.example.json"],
+    "summary": "Synthetic risk-off example for overlay replay.",
+    "data_gaps": ["Synthetic example only."]
+  },
+  "expires_at": "2026-03-19",
+  "policy": {
+    "execution_allowed": false,
+    "downstream_use": "Shadow replay only; deterministic policy controls any exposure mapping."
+  }
+}
