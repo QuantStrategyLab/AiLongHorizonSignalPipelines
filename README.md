@@ -7,6 +7,24 @@ allocation policy. It prepares and validates shadow signal artifacts that can
 later be consumed by sidecar plugins after a separate review and promotion
 process.
 
+## Repository Role
+
+This is a research artifact repository, not an agent runner, model gateway,
+execution service, or strategy plugin repository.
+
+Its job is to keep point-in-time research evidence reproducible:
+
+- build current-market context bundles
+- create dated GitHub Issues for operator review
+- store schema-valid shadow AI signal artifacts
+- preserve `signal_history` for future walk-forward replay
+- provide deterministic replay tooling around saved artifacts
+
+`CodexAuditBridge` remains the only bridge/runner for model providers and
+cross-repository write automation. Future live or notification behavior belongs
+in a separate deterministic plugin after the shadow artifacts have enough
+evidence.
+
 ## Boundary
 
 This repo owns:
@@ -25,6 +43,25 @@ This repo does not own:
 - deterministic strategy rules in `UsEquityStrategies`
 - runtime plugin execution in `QuantStrategyPlugins`
 - API keys for model providers
+- Codex/OpenAI/Anthropic provider routing
+- GitHub App token minting for source repository writes
+- Telegram or broker-facing runtime notifications
+
+## Current Status
+
+This repository is in shadow research accumulation mode. The first saved
+point-in-time artifact is `data/output/signal_history/2026-05-28.json`.
+
+Near-term work should focus on:
+
+- keeping the weekly workflow healthy
+- accumulating saved `signal_history/*.json` artifacts
+- replaying only saved artifacts, not regenerated historical AI judgments
+- improving context quality before any downstream plugin integration
+
+Do not promote the output into runtime allocation or notifications until the
+saved artifact history has enough walk-forward evidence to justify a separate
+plugin contract.
 
 ## Operating Model
 
