@@ -22,7 +22,7 @@ order routing.
 - `AiLongHorizonSignalPipelines` stores context examples, schema, validation,
   replay tooling, and shadow artifacts.
 - `CodexAuditBridge` owns provider routing and API keys.
-- GitHub Issues are the first operator notification layer for scheduled shadow
+- GitHub Issues are the first operator notification layer for monthly shadow
   signal runs.
 - The scheduled workflow builds the market context bundle before dispatching the
   bridge and embeds that bundle into the issue, because the bridge reads the
