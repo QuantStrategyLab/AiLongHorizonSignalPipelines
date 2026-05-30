@@ -4,6 +4,10 @@
 
 Research-only long-horizon AI signal artifact repository for QuantStrategyLab.
 
+Current forward-looking shadow horizon for newly generated context bundles and
+example artifacts is `1-3 years`. Historical saved signal artifacts keep their
+original point-in-time horizon text and should not be rewritten.
+
 This repository does not place trades, store broker credentials, or own live
 allocation policy. It prepares and validates shadow signal artifacts that can
 later be consumed by sidecar plugins after a separate review and promotion

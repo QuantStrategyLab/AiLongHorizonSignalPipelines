@@ -16,7 +16,9 @@ def load_example() -> dict:
 
 
 def test_example_signal_is_valid() -> None:
-    validate_signal(load_example())
+    payload = load_example()
+    validate_signal(payload)
+    assert payload["horizon"] == "1-3 years"
 
 
 def test_signal_must_be_shadow_mode() -> None:

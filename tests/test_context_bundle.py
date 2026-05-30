@@ -20,6 +20,7 @@ def test_build_context_bundle_classifies_trend_and_preserves_shadow_boundary() -
     bundle = build_context_bundle(rows, symbols=["QQQ"], generated_at=dt.datetime(2026, 1, 1, tzinfo=dt.timezone.utc))
 
     assert bundle["as_of"] == "2025-09-17"
+    assert bundle["horizon"] == "1-3 years"
     assert bundle["existing_strategy_context"]["ai_may_place_orders"] is False
     assert bundle["data_quality"]["synthetic"] is False
     assert bundle["price_context"]["QQQ"]["trend"] == "above_200d"
@@ -81,6 +82,7 @@ def test_build_error_context_bundle_keeps_shadow_boundary() -> None:
     )
 
     assert bundle["as_of"] == "2026-01-02"
+    assert bundle["horizon"] == "1-3 years"
     assert bundle["price_context"] == {}
     assert bundle["data_quality"]["errors"] == ["RuntimeError: data source unavailable"]
     assert bundle["existing_strategy_context"]["ai_may_place_orders"] is False

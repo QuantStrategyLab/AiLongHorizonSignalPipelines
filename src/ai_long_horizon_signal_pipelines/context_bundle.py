@@ -249,7 +249,7 @@ def build_context_bundle(
         "schema_version": "1",
         "as_of": latest_as_of,
         "generated_at": timestamp.isoformat().replace("+00:00", "Z"),
-        "horizon": "1-3 months",
+        "horizon": "1-3 years",
         "universe": [symbol.upper() for symbol in symbols],
         "price_context": {
             symbol: {
@@ -296,7 +296,7 @@ def build_error_context_bundle(
         "schema_version": "1",
         "as_of": as_of.isoformat(),
         "generated_at": timestamp.isoformat().replace("+00:00", "Z"),
-        "horizon": "1-3 months",
+        "horizon": "1-3 years",
         "universe": [symbol.upper() for symbol in symbols],
         "price_context": {},
         "existing_strategy_context": {
