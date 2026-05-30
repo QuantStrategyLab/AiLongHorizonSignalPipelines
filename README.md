@@ -230,6 +230,19 @@ Theme membership is research context, not a hot-list override.  Monthly context
 bundles embed `theme_context`; downstream use remains shadow-only and must replay
 saved artifacts rather than regenerating historical AI judgments.
 
+## Scheduled Theme Momentum Refresh
+
+`.github/workflows/theme_momentum_snapshot.yml` runs weekly before the advisor
+publication workflow. It builds `data/output/theme_momentum_snapshot.json` and,
+on scheduled runs, commits the changed snapshot back to the repository so
+`QuantAdvisorResearch` can consume a point-in-time artifact. Manual runs can pass
+`prices_path` to use an audited local CSV instead of Yahoo chart downloads.
+
+Yahoo chart downloads remain a temporary fallback only. The snapshot records
+source metadata and file hashes when a local price CSV is used. Random free proxy
+pools should not be used in this stable pipeline because they make replay, data
+quality, and compliance review harder.
+
 ## Theme Momentum Snapshot
 
 The static taxonomy only defines long-horizon theme membership.  Ranking is done

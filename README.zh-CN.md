@@ -190,6 +190,12 @@ config/symbol_theme_exposure.csv
 
 这些配置是长期研究上下文，不是热点追涨列表。月度 context bundle 会把主题暴露写入 `theme_context`，供 AI shadow review 使用；任何推荐或回测仍必须基于已保存 artifact，不能在回测时重新生成历史判断。
 
+## 主题动量定时刷新
+
+`.github/workflows/theme_momentum_snapshot.yml` 每周在 Advisor 发布前运行，生成 `data/output/theme_momentum_snapshot.json`。定时运行时如果快照有变化，会提交回仓库，供 `QuantAdvisorResearch` 读取点时 artifact。手工运行可以传 `prices_path`，使用可审计的本地价格 CSV，而不是临时下载。
+
+Yahoo chart 下载仍然只是临时 fallback。使用本地价格 CSV 时，快照会记录来源和文件 hash。随机免费代理 IP 池不应进入稳定链路，因为它会增加 replay、数据质量和合规复核难度。
+
 ## 主题动量快照
 
 跨板块主题 taxonomy 只是定义“股票属于哪些长期主题”。真正的排序由独立的主题动量快照完成，避免因为近期热门标的临时改 universe 或权重。

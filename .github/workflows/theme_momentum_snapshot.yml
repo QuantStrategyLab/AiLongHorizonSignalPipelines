@@ -1,0 +1,98 @@
+name: Theme Momentum Snapshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: "Optional YYYY-MM-DD cutoff. Empty uses latest available/downloaded price date."
+        required: false
+        type: string
+      prices_path:
+        description: "Optional local price CSV path. Empty downloads Yahoo chart data as a temporary fallback."
+        required: false
+        default: ""
+        type: string
+      strict_downloads:
+        description: "Fail if any downloaded symbol is unavailable."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      commit_outputs:
+        description: "Commit generated theme_momentum_snapshot.json back to data/output."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+  schedule:
+    # Refresh before the advisory publication workflow. The script records data
+    # source and hash metadata; downstream use remains research-only.
+    - cron: "45 11 * * 6"
+
+permissions:
+  contents: write
+
+jobs:
+  build-theme-momentum:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Build theme momentum snapshot
+        env:
+          INPUT_AS_OF: ${{ github.event.inputs.as_of || '' }}
+          PRICES_PATH: ${{ github.event.inputs.prices_path || '' }}
+          STRICT_DOWNLOADS: ${{ github.event.inputs.strict_downloads || 'false' }}
+        run: |
+          set -euo pipefail
+          mkdir -p data/output
+          ARGS=(--output data/output/theme_momentum_snapshot.json)
+          if [ -n "${INPUT_AS_OF}" ]; then
+            ARGS+=(--as-of "${INPUT_AS_OF}")
+          fi
+          if [ -n "${PRICES_PATH}" ]; then
+            ARGS+=(--prices "${PRICES_PATH}")
+          fi
+          if [ "${STRICT_DOWNLOADS}" = "true" ]; then
+            ARGS+=(--strict-downloads)
+          fi
+          python scripts/build_theme_momentum_snapshot.py "${ARGS[@]}" | tee /tmp/theme_momentum_summary.json
+          {
+            echo "## Theme momentum snapshot"
+            echo ""
+            echo '```json'
+            cat /tmp/theme_momentum_summary.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit snapshot
+        env:
+          COMMIT_OUTPUTS: ${{ github.event_name == 'schedule' && 'true' || github.event.inputs.commit_outputs || 'false' }}
+        run: |
+          set -euo pipefail
+          if [ "${COMMIT_OUTPUTS}" != "true" ]; then
+            echo "Snapshot commit disabled."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/output/theme_momentum_snapshot.json
+          if git diff --cached --quiet; then
+            echo "No theme momentum changes to commit."
+          else
+            git commit -m "Update theme momentum snapshot [skip ci]"
+            git push
+          fi
+      - name: Upload theme momentum artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: theme-momentum-snapshot
+          path: data/output/theme_momentum_snapshot.json
+          if-no-files-found: error
