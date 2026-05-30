@@ -86,3 +86,53 @@ def test_build_error_context_bundle_keeps_shadow_boundary() -> None:
     assert bundle["price_context"] == {}
     assert bundle["data_quality"]["errors"] == ["RuntimeError: data source unavailable"]
     assert bundle["existing_strategy_context"]["ai_may_place_orders"] is False
+
+
+def test_context_bundle_embeds_static_theme_context() -> None:
+    rows = [
+        PriceRow(date=dt.date(2026, 1, 1) + dt.timedelta(days=idx), symbol="MU", close=100 + idx)
+        for idx in range(260)
+    ]
+    theme_context = {
+        "taxonomy_version": "test-v1",
+        "symbol_theme_exposure": {"MU": ["hbm_memory"]},
+        "anti_overfit_policy": {"recent_heat_does_not_change_membership": True},
+    }
+
+    bundle = build_context_bundle(
+        rows,
+        symbols=["MU"],
+        generated_at=dt.datetime(2026, 1, 1, tzinfo=dt.timezone.utc),
+        theme_context=theme_context,
+    )
+
+    assert bundle["theme_context"]["symbol_theme_exposure"]["MU"] == ["hbm_memory"]
+    assert bundle["theme_context"]["anti_overfit_policy"]["recent_heat_does_not_change_membership"] is True
+
+
+def test_build_context_from_source_can_skip_failed_downloads_when_partial_allowed() -> None:
+    def fake_fetch(symbol, *, start, end=None):
+        if symbol == "BAD":
+            raise RuntimeError("temporary unavailable")
+        return {
+            "chart": {
+                "result": [
+                    {
+                        "timestamp": [1767312000, 1767571200],
+                        "indicators": {"adjclose": [{"adjclose": [100.0, 101.0]}]},
+                    }
+                ],
+                "error": None,
+            }
+        }
+
+    bundle = build_context_from_source(
+        symbols=["QQQ", "BAD"],
+        start_date="2026-01-01",
+        end_date="2026-01-06",
+        fetch_fn=fake_fetch,
+        allow_partial_downloads=True,
+    )
+
+    assert sorted(bundle["price_context"]) == ["QQQ"]
+    assert "missing price history for BAD" in bundle["data_quality"]["warnings"]

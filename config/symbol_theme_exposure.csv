@@ -1,0 +1,54 @@
+symbol,theme_ids,exposure_confidence,rationale
+SPY,financial_market_infrastructure,medium,Broad US equity benchmark used as market baseline.
+QQQ,ai_compute;consumer_platforms;cybersecurity,medium,Growth benchmark with large technology and platform concentration.
+SOXX,ai_compute;hbm_memory;foundry_semicap,medium,Semiconductor ETF used as sector benchmark.
+TQQQ,ai_compute;consumer_platforms,low,Leveraged growth proxy; use for regime context only.
+BIL,financial_market_infrastructure,medium,Cash-like short Treasury ETF used as defensive baseline.
+BOXX,financial_market_infrastructure,medium,Cash-like Treasury-box exposure used as defensive baseline.
+IWM,industrial_automation;financial_market_infrastructure,low,Small-cap benchmark for domestic cyclicality context.
+DIA,industrial_automation;financial_market_infrastructure,low,Blue-chip industrial and financial context benchmark.
+XLF,financial_market_infrastructure,medium,Financial sector ETF benchmark.
+XLV,healthcare_policy,medium,Healthcare sector ETF benchmark.
+XLE,energy_security,medium,Energy sector ETF benchmark.
+XLI,industrial_automation;defense_aerospace,medium,Industrial sector ETF benchmark.
+XLU,data_center_power;clean_energy_grid,medium,Utility sector ETF benchmark.
+XLK,ai_compute;cybersecurity;consumer_platforms,medium,Technology sector ETF benchmark.
+AAPL,consumer_platforms;ai_compute,medium,Consumer platform, device ecosystem, services, and edge-AI exposure.
+AMD,ai_compute;foundry_semicap,high,AI accelerators and CPU/GPU data-center exposure.
+AMZN,ai_compute;consumer_platforms,high,AWS AI infrastructure plus e-commerce and advertising platform exposure.
+AVGO,ai_compute;foundry_semicap,high,Custom AI ASICs, networking, and semiconductor infrastructure exposure.
+BA,defense_aerospace;industrial_automation,medium,Aerospace backlog and defense/industrial policy exposure.
+COIN,crypto_infrastructure;financial_market_infrastructure,high,Crypto exchange and digital-asset market-structure exposure.
+CRWD,cybersecurity,high,Endpoint and cloud cybersecurity exposure.
+CVX,energy_security,high,Integrated oil and gas energy-security exposure.
+DELL,ai_server_infrastructure;ai_compute,high,AI server, storage, and enterprise infrastructure exposure.
+ENPH,clean_energy_grid,medium,Solar and distributed energy exposure.
+F,automobility_ev;industrial_automation,medium,Auto cycle, EV transition, and domestic manufacturing exposure.
+GE,industrial_automation;defense_aerospace,medium,Aerospace and industrial equipment exposure.
+GOOGL,ai_compute;consumer_platforms,high,Cloud AI, search/ads, and platform policy exposure.
+INTC,foundry_semicap;ai_compute,high,Domestic foundry, CHIPS Act, and CPU/accelerator exposure.
+IONQ,ai_compute,low,Quantum compute exposure; high uncertainty.
+JPM,financial_market_infrastructure,high,Systemic bank, rates, credit, and capital-markets exposure.
+LMT,defense_aerospace,high,Defense prime and government procurement exposure.
+META,ai_compute;consumer_platforms,high,AI infrastructure, ads, and social platform exposure.
+MSFT,ai_compute;cybersecurity,high,Cloud AI, enterprise software, and security exposure.
+MSTR,crypto_infrastructure,high,Bitcoin treasury and digital-asset beta exposure.
+MU,hbm_memory;ai_compute,high,HBM, DRAM, and AI memory-cycle exposure.
+NEE,data_center_power;clean_energy_grid,high,Utility, renewables, and data-center power-demand exposure.
+NOC,defense_aerospace,high,Defense prime and aerospace systems exposure.
+NVDA,ai_compute,high,AI accelerator and platform ecosystem exposure.
+OKLO,data_center_power;clean_energy_grid,low,Nuclear power and data-center energy optionality; early-stage risk.
+ORCL,ai_compute;ai_server_infrastructure,medium,Cloud AI infrastructure and enterprise software exposure.
+PANW,cybersecurity,high,Network and cloud cybersecurity exposure.
+PLTR,ai_compute;defense_aerospace,medium,Government AI software and defense analytics exposure.
+QCOM,ai_compute;consumer_platforms,medium,Edge AI, mobile, and semiconductor platform exposure.
+RBLX,consumer_platforms,medium,Gaming and consumer platform exposure.
+RTX,defense_aerospace,high,Defense and aerospace procurement exposure.
+SMCI,ai_server_infrastructure;data_center_power,high,AI server and rack-scale infrastructure exposure.
+SMR,data_center_power;clean_energy_grid,low,Nuclear energy and grid transition optionality; early-stage risk.
+SOFI,financial_market_infrastructure,medium,Consumer finance and fintech infrastructure exposure.
+TSLA,automobility_ev;ai_compute;data_center_power,medium,EV, autonomy, energy storage, and AI optionality exposure.
+TSM,foundry_semicap;ai_compute,high,Leading-edge foundry and AI supply-chain exposure.
+UNH,healthcare_policy,high,Managed care and healthcare policy exposure.
+VRT,data_center_power;ai_server_infrastructure,high,Data-center power and cooling infrastructure exposure.
+XOM,energy_security,high,Integrated oil and gas energy-security exposure.

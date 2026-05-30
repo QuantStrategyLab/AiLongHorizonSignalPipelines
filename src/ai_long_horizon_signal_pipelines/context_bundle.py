@@ -15,7 +15,48 @@ from urllib.request import Request, urlopen
 from .price_history import PriceRow, parse_price_date, read_price_rows
 
 
-DEFAULT_UNIVERSE = ("SPY", "QQQ", "SOXX", "TQQQ", "BIL", "BOXX")
+DEFAULT_UNIVERSE = (
+    "SPY",
+    "QQQ",
+    "SOXX",
+    "TQQQ",
+    "BIL",
+    "BOXX",
+    "IWM",
+    "DIA",
+    "XLF",
+    "XLV",
+    "XLE",
+    "XLI",
+    "XLU",
+    "XLK",
+    "NVDA",
+    "AMD",
+    "AVGO",
+    "TSM",
+    "MU",
+    "INTC",
+    "DELL",
+    "SMCI",
+    "VRT",
+    "MSFT",
+    "GOOGL",
+    "AMZN",
+    "META",
+    "CRWD",
+    "PANW",
+    "LMT",
+    "RTX",
+    "NOC",
+    "CVX",
+    "XOM",
+    "JPM",
+    "UNH",
+    "NEE",
+    "TSLA",
+    "COIN",
+    "MSTR",
+)
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
 YAHOO_USER_AGENT = "Mozilla/5.0"
 
@@ -119,19 +160,31 @@ def download_price_rows(
     start: dt.date,
     end: dt.date | None = None,
     fetch_fn: Callable[..., Mapping[str, Any]] | None = None,
+    allow_partial: bool = False,
 ) -> list[PriceRow]:
     fetch = fetch_fn or fetch_yahoo_chart_payload
     rows: list[PriceRow] = []
     missing: list[str] = []
+    failed: list[str] = []
     for symbol in symbols:
-        payload = fetch(symbol, start=start, end=end)
-        symbol_rows = normalize_yahoo_chart_payload(payload, symbol=symbol)
+        try:
+            payload = fetch(symbol, start=start, end=end)
+            symbol_rows = normalize_yahoo_chart_payload(payload, symbol=symbol)
+        except Exception as exc:
+            if not allow_partial:
+                raise RuntimeError(f"price download failed for {symbol}: {exc}") from exc
+            failed.append(symbol)
+            continue
         if not symbol_rows:
             missing.append(symbol)
         rows.extend(symbol_rows)
         time.sleep(0.05)
-    if missing:
-        raise RuntimeError(f"price download missing symbols: {', '.join(missing)}")
+    unavailable = missing + failed
+    if unavailable and not allow_partial:
+        raise RuntimeError(f"price download missing symbols: {', '.join(unavailable)}")
+    if not rows:
+        detail = f" unavailable symbols: {', '.join(unavailable)}" if unavailable else ""
+        raise RuntimeError(f"price download produced no usable rows for: {', '.join(symbols)}.{detail}")
     return sorted(rows, key=lambda item: (item.date, item.symbol))
 
 
@@ -222,6 +275,7 @@ def build_context_bundle(
     *,
     symbols: list[str],
     generated_at: dt.datetime | None = None,
+    theme_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     contexts: dict[str, SymbolContext] = {}
     warnings: list[str] = []
@@ -245,7 +299,7 @@ def build_context_bundle(
         warnings.append(f"symbols not updated to latest as_of {latest_as_of}: {', '.join(stale_symbols)}")
 
     timestamp = generated_at or dt.datetime.now(dt.timezone.utc)
-    return {
+    bundle = {
         "schema_version": "1",
         "as_of": latest_as_of,
         "generated_at": timestamp.isoformat().replace("+00:00", "Z"),
@@ -281,6 +335,9 @@ def build_context_bundle(
             "Historical AI judgments must come from saved artifacts, not regenerated prompts.",
         ],
     }
+    if theme_context is not None:
+        bundle["theme_context"] = dict(theme_context)
+    return bundle
 
 
 def build_error_context_bundle(
@@ -289,10 +346,11 @@ def build_error_context_bundle(
     error: str,
     as_of_date: dt.date | None = None,
     generated_at: dt.datetime | None = None,
+    theme_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     as_of = as_of_date or dt.date.today()
     timestamp = generated_at or dt.datetime.now(dt.timezone.utc)
-    return {
+    bundle = {
         "schema_version": "1",
         "as_of": as_of.isoformat(),
         "generated_at": timestamp.isoformat().replace("+00:00", "Z"),
@@ -315,6 +373,9 @@ def build_error_context_bundle(
             "This is an operator notification input, not a trading instruction.",
         ],
     }
+    if theme_context is not None:
+        bundle["theme_context"] = dict(theme_context)
+    return bundle
 
 
 def round_optional(value: float | None, digits: int = 6) -> float | None:
@@ -333,14 +394,22 @@ def build_context_from_source(
     end_date: str | None = None,
     lookback_days: int = 420,
     fetch_fn: Callable[..., Mapping[str, Any]] | None = None,
+    theme_context: Mapping[str, Any] | None = None,
+    allow_partial_downloads: bool = False,
 ) -> dict[str, Any]:
     end = parse_price_date(end_date) if end_date else dt.date.today()
     start = parse_price_date(start_date) if start_date else end - dt.timedelta(days=int(lookback_days))
     if prices_path is not None:
         rows = read_price_rows(prices_path, symbols=symbols, start_date=start.isoformat(), end_date=end.isoformat())
     else:
-        rows = download_price_rows(symbols, start=start, end=end, fetch_fn=fetch_fn)
-    return build_context_bundle(rows, symbols=symbols)
+        rows = download_price_rows(
+            symbols,
+            start=start,
+            end=end,
+            fetch_fn=fetch_fn,
+            allow_partial=allow_partial_downloads,
+        )
+    return build_context_bundle(rows, symbols=symbols, theme_context=theme_context)
 
 
 def write_context_bundle(bundle: Mapping[str, Any], path: Path) -> None:

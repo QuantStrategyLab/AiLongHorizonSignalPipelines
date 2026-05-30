@@ -176,3 +176,45 @@ data/output/signal_history/YYYY-MM-DD.json
 ## 许可证
 
 本仓库使用 MIT License。详见 [LICENSE](LICENSE)。
+
+## 跨板块主题 universe
+
+本仓库现在不仅覆盖 AI 主题，也固定维护一个跨板块长期主题 taxonomy：
+
+```text
+config/theme_taxonomy.csv
+config/symbol_theme_exposure.csv
+```
+
+覆盖方向包括 AI compute、HBM/存储、foundry/半导体政策、AI server、数据中心电力、网络安全、国防航天、能源安全、清洁电网、金融基础设施、医疗政策、消费平台、工业自动化、crypto 基础设施和 EV/汽车。
+
+这些配置是长期研究上下文，不是热点追涨列表。月度 context bundle 会把主题暴露写入 `theme_context`，供 AI shadow review 使用；任何推荐或回测仍必须基于已保存 artifact，不能在回测时重新生成历史判断。
+
+## 主题动量快照
+
+跨板块主题 taxonomy 只是定义“股票属于哪些长期主题”。真正的排序由独立的主题动量快照完成，避免因为近期热门标的临时改 universe 或权重。
+
+使用本地价格 CSV 生成快照：
+
+```bash
+python scripts/build_theme_momentum_snapshot.py \
+  --prices data/input/theme_price_history.csv \
+  --symbols MU,INTC,DELL,NVDA,VRT,UNH,XOM,JPM,LMT \
+  --output data/output/theme_momentum_snapshot.json
+```
+
+不传 `--prices` 时脚本会通过 Yahoo chart endpoint 下载价格。默认允许部分 symbol 下载失败，失败标的会进入 `data_quality.missing_price_symbols`；如果需要严格模式，传 `--strict-downloads`。
+
+快照会输出：
+
+- `theme_ranks`：主题排名、动量分、breadth、风险惩罚和主题内 top symbols
+- `methodology`：固定窗口和权重，便于后续 walk-forward replay
+- `policy`：明确这是研究排序，不允许下单或仓位分配
+
+当前固定窗口：
+
+- `12-1m`：252 个交易日 lookback，跳过最近 21 个交易日
+- `6-1m`：126 个交易日 lookback，跳过最近 21 个交易日
+- `3m`：63 个交易日近期动量
+
+主题排名只说明“哪些主题值得研究”，不是买入信号。进入 Advisor 推荐仍需要事件证据、来源质量和风险检查。

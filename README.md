@@ -210,3 +210,45 @@ conservative:
 ## License
 
 This repository is licensed under the MIT License. See [LICENSE](LICENSE).
+
+## Cross-Sector Theme Universe
+
+The repository now keeps a static, versioned cross-sector theme universe instead
+of limiting long-horizon research to the current AI trade:
+
+```text
+config/theme_taxonomy.csv
+config/symbol_theme_exposure.csv
+```
+
+The taxonomy covers AI compute, HBM/memory, foundry policy, AI servers,
+data-center power, cybersecurity, defense/aerospace, energy security, clean grid,
+financial infrastructure, healthcare policy, consumer platforms, industrial
+automation, crypto infrastructure, and EV/auto transition.
+
+Theme membership is research context, not a hot-list override.  Monthly context
+bundles embed `theme_context`; downstream use remains shadow-only and must replay
+saved artifacts rather than regenerating historical AI judgments.
+
+## Theme Momentum Snapshot
+
+The static taxonomy only defines long-horizon theme membership.  Ranking is done
+by a separate theme momentum snapshot so the universe and weights are not changed
+just because a currently popular symbol has moved.
+
+Build from a local price CSV:
+
+```bash
+python scripts/build_theme_momentum_snapshot.py \
+  --prices data/input/theme_price_history.csv \
+  --symbols MU,INTC,DELL,NVDA,VRT,UNH,XOM,JPM,LMT \
+  --output data/output/theme_momentum_snapshot.json
+```
+
+If `--prices` is omitted, the script downloads Yahoo chart data.  Partial symbol
+failures are recorded in `data_quality.missing_price_symbols` by default;
+`--strict-downloads` turns those into hard failures.
+
+The snapshot records fixed 12-1m, 6-1m, and 3m momentum windows, breadth, risk
+penalties, top symbols per theme, and a policy block that keeps the artifact
+research-only.

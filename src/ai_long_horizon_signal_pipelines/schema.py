@@ -90,12 +90,15 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     _require_string_list(payload["risk_flags"], "risk_flags", allow_empty=True)
 
     candidate_bias = _require_mapping(payload["candidate_bias"], "candidate_bias")
-    for symbol, bias in candidate_bias.items():
-        _require_string(symbol, "candidate_bias key")
-        if bias not in ALLOWED_BIAS_VALUES:
-            raise SignalValidationError(
-                f"candidate_bias[{symbol!r}] must be one of: {', '.join(sorted(ALLOWED_BIAS_VALUES))}"
-            )
+    _validate_bias_mapping(candidate_bias, "candidate_bias")
+
+    if "theme_bias" in payload:
+        _validate_bias_mapping(_require_mapping(payload["theme_bias"], "theme_bias"), "theme_bias")
+    if "symbol_theme_exposure" in payload:
+        symbol_theme_exposure = _require_mapping(payload["symbol_theme_exposure"], "symbol_theme_exposure")
+        for symbol, theme_ids in symbol_theme_exposure.items():
+            _require_string(symbol, "symbol_theme_exposure key")
+            _require_string_list(theme_ids, f"symbol_theme_exposure[{symbol!r}]")
 
     confidence = payload["confidence"]
     if not isinstance(confidence, (int, float)) or isinstance(confidence, bool):
@@ -113,3 +116,12 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     if policy.get("execution_allowed") is not False:
         raise SignalValidationError("policy.execution_allowed must be false")
     _require_string(policy.get("downstream_use"), "policy.downstream_use")
+
+
+def _validate_bias_mapping(mapping: Mapping[str, Any], name: str) -> None:
+    for key, bias in mapping.items():
+        _require_string(key, f"{name} key")
+        if bias not in ALLOWED_BIAS_VALUES:
+            raise SignalValidationError(
+                f"{name}[{key!r}] must be one of: {', '.join(sorted(ALLOWED_BIAS_VALUES))}"
+            )

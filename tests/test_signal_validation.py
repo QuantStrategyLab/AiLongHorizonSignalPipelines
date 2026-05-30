@@ -43,3 +43,19 @@ def test_confidence_must_be_bounded() -> None:
 
     with pytest.raises(SignalValidationError, match="between 0 and 1"):
         validate_signal(payload)
+
+
+def test_signal_accepts_optional_theme_bias_and_exposure() -> None:
+    payload = load_example()
+    payload["theme_bias"] = {"hbm_memory": "positive", "healthcare_policy": "watch"}
+    payload["symbol_theme_exposure"] = {"MU": ["hbm_memory"], "UNH": ["healthcare_policy"]}
+
+    validate_signal(payload)
+
+
+def test_signal_rejects_invalid_theme_bias() -> None:
+    payload = load_example()
+    payload["theme_bias"] = {"hbm_memory": "hot"}
+
+    with pytest.raises(SignalValidationError, match="theme_bias"):
+        validate_signal(payload)

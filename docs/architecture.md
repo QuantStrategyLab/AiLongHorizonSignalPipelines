@@ -83,3 +83,58 @@ repository only stores small extracted replay inputs when needed for research.
 The artifact is research evidence, not a trading instruction. Missing evidence,
 expired artifacts, low confidence, or schema failures should default to no-op in
 any downstream consumer.
+
+## Cross-Sector Theme Taxonomy
+
+The long-horizon context must not be limited to the current hot AI trade.  The
+stable research universe now uses a static, versioned theme taxonomy stored in:
+
+```text
+config/theme_taxonomy.csv
+config/symbol_theme_exposure.csv
+```
+
+The taxonomy intentionally covers multiple durable sectors:
+
+- AI compute, HBM/memory, foundry and AI server infrastructure
+- data-center power, utilities, grid transition and nuclear optionality
+- cybersecurity
+- defense and aerospace
+- energy security and hydrocarbons
+- financial and market infrastructure
+- healthcare policy
+- consumer platforms, industrial automation, EV/auto, and crypto infrastructure
+
+Theme membership is static research context.  A symbol is not added to a theme
+just because it is hot this month.  Monthly AI output may express `theme_bias`,
+but downstream consumers must keep that output shadow-only and replay saved
+artifacts point-in-time.
+
+This is the anti-overfit boundary:
+
+1. Define universe and theme exposure before looking at future returns.
+2. Save every AI theme judgment as an artifact.
+3. Replay only saved artifacts; never regenerate old model judgments.
+4. Treat theme bias as context, not as execution or allocation.
+
+## Theme Momentum Snapshot
+
+A cross-sector theme ranking is produced separately from the static taxonomy.
+The snapshot uses fixed windows rather than tuning to recent winners:
+
+- 12-1 month momentum: 252 trading-day lookback, skipping the latest 21 trading days
+- 6-1 month momentum: 126 trading-day lookback, skipping the latest 21 trading days
+- 3 month momentum: 63 trading-day recent trend
+- breadth: share of priced theme members with positive 3 month returns
+- risk penalty: 63 day realized volatility and 126 day drawdown
+
+Output path convention:
+
+```text
+data/output/theme_momentum_snapshot.json
+```
+
+The artifact is point-in-time research context.  It ranks themes and highlights
+strong members inside a theme, but it does not encode orders, target weights, or
+execution policy.  Future replay must consume saved snapshots rather than
+recomputing old theme ranks with revised constituents or revised weights.
