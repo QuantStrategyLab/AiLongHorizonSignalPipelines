@@ -4,9 +4,10 @@
 
 Research-only signal context artifact repository for QuantStrategyLab.
 
-Current forward-looking shadow horizon for newly generated context bundles and
-example artifacts is `1-3 years`. Historical saved signal artifacts keep their
-original point-in-time horizon text and should not be rewritten.
+Current schema validation requires newly generated and promoted shadow signal
+artifacts to use the `1-3 years` horizon. Older pre-contract artifacts may keep
+their original point-in-time horizon text, but they should be treated as legacy
+records and not promoted as the current `latest_signal.json`.
 
 This repository does not place trades, store broker credentials, or own live
 allocation policy. It prepares and validates shadow signal artifacts that can
@@ -56,7 +57,9 @@ This repo does not own:
 ## Current Status
 
 This repository is in shadow research accumulation mode. The first saved
-point-in-time artifact is `data/output/signal_history/2026-05-28.json`.
+point-in-time artifact is `data/output/signal_history/2026-05-28.json`; the
+current promoted artifact is `data/output/signal_history/2026-05-31.json` and
+uses the long-horizon contract.
 
 Near-term work should focus on:
 
@@ -211,6 +214,11 @@ Historical generated copies can be stored under:
 ```text
 data/output/signal_history/YYYY-MM-DD.json
 ```
+
+All promoted latest artifacts must use `horizon: "1-3 years"`. To support
+Advisor long-horizon buckets, current artifacts should also include versioned
+theme context through `theme_bias`, `symbol_theme_exposure`, and optional
+`symbol_bias` for symbols that need explicit long-context coverage.
 
 All artifacts must remain shadow-only. They cannot encode broker orders, target
 quantities, or live allocation overrides.

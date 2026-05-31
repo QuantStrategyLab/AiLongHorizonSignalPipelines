@@ -27,6 +27,7 @@ REQUIRED_TOP_LEVEL_KEYS = (
 
 ALLOWED_REGIMES = frozenset({"risk_on", "risk_off", "neutral", "mixed", "unknown"})
 ALLOWED_BIAS_VALUES = frozenset({"positive", "negative", "neutral", "watch", "avoid"})
+REQUIRED_SIGNAL_HORIZON = "1-3 years"
 
 
 def _require_mapping(value: Any, name: str) -> Mapping[str, Any]:
@@ -92,7 +93,8 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     if _require_string(payload["regime"], "regime") not in ALLOWED_REGIMES:
         raise SignalValidationError(f"regime must be one of: {', '.join(sorted(ALLOWED_REGIMES))}")
 
-    _require_string(payload["horizon"], "horizon")
+    if _require_string(payload["horizon"], "horizon") != REQUIRED_SIGNAL_HORIZON:
+        raise SignalValidationError(f"horizon must be {REQUIRED_SIGNAL_HORIZON!r}")
     _require_string_list(payload["universe"], "universe")
     _require_string_list(payload["risk_flags"], "risk_flags", allow_empty=True)
 

@@ -82,7 +82,9 @@ repository only stores small extracted replay inputs when needed for research.
 
 The artifact is research evidence, not a trading instruction. Missing evidence,
 expired artifacts, low confidence, or schema failures should default to no-op in
-any downstream consumer.
+any downstream consumer. Current promoted signal artifacts must use the
+`1-3 years` horizon and provide enough theme or symbol coverage for Advisor to
+distinguish a genuine missing long-horizon signal from an ingestion gap.
 
 ## Cross-Sector Theme Taxonomy
 

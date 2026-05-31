@@ -1,26 +1,28 @@
 {
-  "schema_version": "1",
   "artifact": "data/output/latest_signal.json",
-  "history_artifact": "data/output/signal_history/2026-05-28.json",
-  "artifact_sha256": "d21c65ffbcc62386201ad2fe8139acaaf4b842e5019c9e768b3b7e2678e9ff31",
-  "as_of": "2026-05-28",
-  "generated_at": "2026-05-28T14:38:47.474891Z",
+  "artifact_sha256": "39368aa3eae5da168665fde58edbe17bbef1c70fa4070b58051c928aaefc0b1a",
+  "as_of": "2026-05-31",
+  "generated_at": "2026-05-31T10:52:51Z",
+  "history_artifact": "data/output/signal_history/2026-05-31.json",
   "mode": "shadow",
+  "policy": {
+    "downstream_use": "Manifest only records provenance for a shadow research artifact; it does not authorize execution.",
+    "execution_allowed": false
+  },
+  "schema_version": "1",
+  "source_files": [
+    "config/theme_taxonomy.csv",
+    "config/symbol_theme_exposure.csv",
+    "data/output/theme_momentum_snapshot.json",
+    ".codex-audit/monthly_issue.md"
+  ],
   "source_issue": "https://github.com/QuantStrategyLab/ResearchSignalContextPipelines/issues/4",
   "source_ref": "main",
-  "source_files": [
-    ".codex-audit/monthly_issue.md",
-    ".codex-audit/context.json"
-  ],
   "validation": {
     "commands": [
       "python scripts/validate_latest_signal.py",
-      "python scripts/validate_latest_signal.py data/output/signal_history/2026-05-28.json"
+      "python scripts/validate_latest_signal.py data/output/signal_history/2026-05-31.json"
     ],
     "status": "passed"
-  },
-  "policy": {
-    "execution_allowed": false,
-    "downstream_use": "Manifest only records provenance for a shadow research artifact; it does not authorize execution."
   }
 }

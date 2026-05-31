@@ -21,6 +21,14 @@ def test_example_signal_is_valid() -> None:
     assert payload["horizon"] == "1-3 years"
 
 
+def test_signal_requires_long_horizon_contract() -> None:
+    payload = load_example()
+    payload["horizon"] = "1-3 months"
+
+    with pytest.raises(SignalValidationError, match="horizon"):
+        validate_signal(payload)
+
+
 def test_signal_must_be_shadow_mode() -> None:
     payload = load_example()
     payload["mode"] = "live"
@@ -90,3 +98,15 @@ def test_signal_rejects_invalid_structured_bias_confidence() -> None:
 
     with pytest.raises(SignalValidationError, match="confidence"):
         validate_signal(payload)
+
+
+def test_committed_latest_signal_covers_advisor_long_context() -> None:
+    payload = json.loads((ROOT / "data" / "output" / "latest_signal.json").read_text(encoding="utf-8"))
+
+    validate_signal(payload)
+
+    assert payload["horizon"] == "1-3 years"
+    assert payload.get("theme_bias")
+    assert payload.get("symbol_theme_exposure")
+    covered_symbols = set(payload.get("symbol_bias", {})) | set(payload.get("symbol_theme_exposure", {}))
+    assert {"MU", "INTC", "AMD", "VRT", "DELL"} <= covered_symbols

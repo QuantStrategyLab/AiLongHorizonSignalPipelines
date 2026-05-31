@@ -4,6 +4,8 @@
 
 QuantStrategyLab 的研究型信号上下文 artifact 仓库。
 
+当前 schema validation 要求新生成和 promoted 的 shadow signal artifact 使用 `1-3 years` 周期。较早的 pre-contract 历史 artifact 可以保留原始点时 horizon 文本，但不应再作为当前 `latest_signal.json` 推广。
+
 本仓库不下单、不保存券商凭证，也不拥有实盘仓位策略。它只负责准备、校验、保存和回放长周期 AI shadow signal。任何未来的下游使用，都必须经过单独评审，并由确定性插件或策略显式消费。
 
 ## 仓库定位
@@ -49,6 +51,14 @@ QuantStrategyLab 的研究型信号上下文 artifact 仓库。
 ```text
 data/output/signal_history/2026-05-28.json
 ```
+
+当前 promoted artifact 是：
+
+```text
+data/output/signal_history/2026-05-31.json
+```
+
+它使用长线 contract，并补充了 `theme_bias`、`symbol_theme_exposure` 和 `symbol_bias`，供 Advisor 判断长线背景是否可用。
 
 近期工作重点：
 
@@ -175,6 +185,8 @@ data/output/latest_signal.json
 ```text
 data/output/signal_history/YYYY-MM-DD.json
 ```
+
+所有 promoted latest artifacts 必须使用 `horizon: "1-3 years"`。为了支持 Advisor 的长线栏位，当前 artifact 应包含 `theme_bias`、`symbol_theme_exposure`，必要时用 `symbol_bias` 补充单个股票的长线背景。
 
 所有 artifacts 必须保持 shadow-only。它们不能编码券商订单、目标数量或实盘 allocation override。
 
