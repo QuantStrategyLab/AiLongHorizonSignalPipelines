@@ -50,7 +50,7 @@ def test_upsert_issue_updates_existing_issue(monkeypatch) -> None:
 
     action, issue_number, issue_url = shadow_issue.upsert_issue(
         api_url="https://api.github.test",
-        repo="QuantStrategyLab/AiLongHorizonSignalPipelines",
+        repo="QuantStrategyLab/ResearchSignalContextPipelines",
         token="token",
         title="Long-horizon AI shadow signal: 2026-05-29",
         body="body",
@@ -84,7 +84,7 @@ def test_upsert_issue_creates_missing_label_and_issue(monkeypatch) -> None:
 
     action, issue_number, issue_url = shadow_issue.upsert_issue(
         api_url="https://api.github.test",
-        repo="QuantStrategyLab/AiLongHorizonSignalPipelines",
+        repo="QuantStrategyLab/ResearchSignalContextPipelines",
         token="token",
         title="Long-horizon AI shadow signal: 2026-05-29",
         body="body",

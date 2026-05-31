@@ -1,4 +1,4 @@
-"""Shadow-only long-horizon AI signal artifact helpers."""
+"""Research signal context artifact helpers."""
 
 from .overlay_backtest import OverlayPolicy, backtest_overlay
 from .context_bundle import DEFAULT_UNIVERSE, build_context_bundle, build_context_from_source

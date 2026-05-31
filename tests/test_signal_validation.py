@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from ai_long_horizon_signal_pipelines import SignalValidationError, validate_signal
+from research_signal_context_pipelines import SignalValidationError, validate_signal
 
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -6,7 +6,7 @@
   "as_of": "2026-05-28",
   "generated_at": "2026-05-28T14:38:47.474891Z",
   "mode": "shadow",
-  "source_issue": "https://github.com/QuantStrategyLab/AiLongHorizonSignalPipelines/issues/4",
+  "source_issue": "https://github.com/QuantStrategyLab/ResearchSignalContextPipelines/issues/4",
   "source_ref": "main",
   "source_files": [
     ".codex-audit/monthly_issue.md",

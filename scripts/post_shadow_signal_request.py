@@ -24,7 +24,7 @@ def github_request(method: str, url: str, token: str, payload: dict[str, Any] | 
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "ai-long-horizon-shadow-signal",
+        "User-Agent": "research-signal-context-pipelines",
     }
     if payload is not None:
         data = json.dumps(payload).encode("utf-8")

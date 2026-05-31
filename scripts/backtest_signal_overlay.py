@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from ai_long_horizon_signal_pipelines.overlay_backtest import (  # noqa: E402
+from research_signal_context_pipelines.overlay_backtest import (  # noqa: E402
     OverlayPolicy,
     backtest_overlay,
     load_price_history,

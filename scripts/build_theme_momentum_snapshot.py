@@ -13,13 +13,13 @@ sys.path.insert(0, str(ROOT / "src"))
 DEFAULT_THEME_TAXONOMY = ROOT / "config" / "theme_taxonomy.csv"
 DEFAULT_THEME_EXPOSURES = ROOT / "config" / "symbol_theme_exposure.csv"
 
-from ai_long_horizon_signal_pipelines.context_bundle import download_price_rows  # noqa: E402
-from ai_long_horizon_signal_pipelines.price_history import parse_price_date, read_price_rows  # noqa: E402
-from ai_long_horizon_signal_pipelines.theme_momentum import (  # noqa: E402
+from research_signal_context_pipelines.context_bundle import download_price_rows  # noqa: E402
+from research_signal_context_pipelines.price_history import parse_price_date, read_price_rows  # noqa: E402
+from research_signal_context_pipelines.theme_momentum import (  # noqa: E402
     build_theme_momentum_snapshot,
     write_theme_momentum_snapshot,
 )
-from ai_long_horizon_signal_pipelines.theme_universe import (  # noqa: E402
+from research_signal_context_pipelines.theme_universe import (  # noqa: E402
     load_symbol_theme_exposure,
     load_theme_taxonomy,
 )

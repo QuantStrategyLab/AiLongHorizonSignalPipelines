@@ -1,8 +1,8 @@
-# AiLongHorizonSignalPipelines
+# ResearchSignalContextPipelines
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-QuantStrategyLab 的研究型长周期 AI shadow signal artifact 仓库。
+QuantStrategyLab 的研究型信号上下文 artifact 仓库。
 
 本仓库不下单、不保存券商凭证，也不拥有实盘仓位策略。它只负责准备、校验、保存和回放长周期 AI shadow signal。任何未来的下游使用，都必须经过单独评审，并由确定性插件或策略显式消费。
 
@@ -71,9 +71,7 @@ data/output/signal_history/2026-05-28.json
 
 ## 名称和周期边界
 
-当前暂不建议改仓库名。`AiLongHorizonSignalPipelines` 仍然准确描述了本仓库的核心职责：维护长周期 AI shadow context 和跨板块主题研究 artifact。短线/中线/长线最终推荐是在 `QuantAdvisorResearch` 里生成的，不由本仓库直接输出。
-
-如果后续主题动量层明显扩展成更通用的研究信号仓，可以单独评估改名，例如 `LongHorizonResearchSignals`。这需要迁移 GitHub 仓库链接、跨仓 checkout 路径和文档引用，不建议和本次数据质量增强混在一起做。
+`ResearchSignalContextPipelines` 是这一层的正式仓库名。这个名字对应它现在的真实职责：维护可复用的研究上下文 artifact，包括中线主题动量和长线 AI shadow context。短线/中线/长线最终推荐仍由 `QuantAdvisorResearch` 生成，本仓库不直接输出最终推荐。
 
 
 ## 短中长线边界

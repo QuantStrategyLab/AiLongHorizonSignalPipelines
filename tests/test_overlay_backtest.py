@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 from pathlib import Path
 
-from ai_long_horizon_signal_pipelines.overlay_backtest import (
+from research_signal_context_pipelines.overlay_backtest import (
     OverlayPolicy,
     backtest_overlay,
     exposure_for_signal,

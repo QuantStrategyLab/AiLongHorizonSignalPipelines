@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import datetime as dt
 
-from ai_long_horizon_signal_pipelines.context_bundle import (
+from research_signal_context_pipelines.context_bundle import (
     build_context_bundle,
     build_error_context_bundle,
     build_context_from_source,
     normalize_yahoo_chart_payload,
 )
-from ai_long_horizon_signal_pipelines.price_history import PriceRow
+from research_signal_context_pipelines.price_history import PriceRow
 
 
 def test_build_context_bundle_classifies_trend_and_preserves_shadow_boundary() -> None:

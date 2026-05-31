@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ai_long_horizon_signal_pipelines.theme_universe import (
+from research_signal_context_pipelines.theme_universe import (
     build_theme_context,
     load_symbol_theme_exposure,
     load_theme_taxonomy,

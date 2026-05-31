@@ -3,7 +3,7 @@
 ## Current Architecture Understanding
 
 QuantStrategyLab already separates strategy math, snapshot generation, runtime
-execution, and broker adapters. This repository adds a research-only AI signal
+execution, and broker adapters. This repository adds a research-only signal context
 pipeline without changing that production boundary.
 
 This repository is deliberately narrower than `CodexAuditBridge`. It owns
@@ -19,7 +19,7 @@ order routing.
 
 ## Recommended Low-Risk Shape
 
-- `AiLongHorizonSignalPipelines` stores context examples, schema, validation,
+- `ResearchSignalContextPipelines` stores context examples, schema, validation,
   replay tooling, and shadow artifacts.
 - `CodexAuditBridge` owns provider routing and API keys.
 - GitHub Issues are the first operator notification layer for monthly shadow
@@ -145,9 +145,7 @@ snapshots rather than recomputing old theme ranks with revised constituents or r
 
 ## Repository Name Decision
 
-Keep `AiLongHorizonSignalPipelines` for now. The short/medium/long final
-recommendation buckets live in `QuantAdvisorResearch`; this repository still
-provides long-horizon AI shadow context plus cross-sector theme artifacts. A
-rename to `LongHorizonResearchSignals` may be reasonable later, but it should be
-a deliberate migration because cross-repository workflow checkouts and public
-links would need updates.
+`ResearchSignalContextPipelines` is the canonical name. The short/medium/long
+final recommendation buckets live in `QuantAdvisorResearch`; this repository
+provides reusable research context artifacts, including medium-horizon theme
+momentum and long-horizon AI shadow context.

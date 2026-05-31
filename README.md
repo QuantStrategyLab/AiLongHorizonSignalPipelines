@@ -1,8 +1,8 @@
-# AiLongHorizonSignalPipelines
+# ResearchSignalContextPipelines
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-Research-only long-horizon AI signal artifact repository for QuantStrategyLab.
+Research-only signal context artifact repository for QuantStrategyLab.
 
 Current forward-looking shadow horizon for newly generated context bundles and
 example artifacts is `1-3 years`. Historical saved signal artifacts keep their
@@ -87,15 +87,11 @@ plugin contract.
 
 ## Name and Horizon Boundary
 
-The repository name remains acceptable for now because this repo owns the
-long-horizon AI shadow context and cross-sector theme research artifacts.
-Short/medium/long final recommendations are produced by
+`ResearchSignalContextPipelines` is the canonical repository name for this layer.
+The name reflects its actual responsibility: maintaining reusable research
+context artifacts, including medium-horizon theme momentum and long-horizon AI
+shadow context. Short/medium/long final recommendations are still produced by
 `QuantAdvisorResearch`, not by this repository.
-
-If the theme-momentum layer later becomes broader than AI context, a future
-rename such as `LongHorizonResearchSignals` can be considered, but that should
-be a separate migration because GitHub repo links, cross-repo checkout paths,
-and documentation references would all need updates.
 
 
 ## Horizon Boundary

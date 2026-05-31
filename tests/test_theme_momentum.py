@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import datetime as dt
 
-from ai_long_horizon_signal_pipelines.price_history import PriceRow
-from ai_long_horizon_signal_pipelines.theme_momentum import build_theme_momentum_snapshot
-from ai_long_horizon_signal_pipelines.theme_universe import SymbolThemeExposure, ThemeDefinition
+from research_signal_context_pipelines.price_history import PriceRow
+from research_signal_context_pipelines.theme_momentum import build_theme_momentum_snapshot
+from research_signal_context_pipelines.theme_universe import SymbolThemeExposure, ThemeDefinition
 
 
 def _trend_rows(symbol: str, *, start_close: float, daily_step: float, days: int = 280) -> list[PriceRow]:

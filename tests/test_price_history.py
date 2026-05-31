@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import csv
 
-from ai_long_horizon_signal_pipelines.price_history import (
+from research_signal_context_pipelines.price_history import (
     parse_price_date,
     read_price_rows,
     write_filtered_price_history,
