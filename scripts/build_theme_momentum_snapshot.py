@@ -107,7 +107,9 @@ def main() -> int:
                 "ranked_theme_count": snapshot["summary"]["ranked_theme_count"],
                 "priced_symbol_count": snapshot["summary"]["priced_symbol_count"],
                 "top_theme_ids": snapshot["summary"]["top_theme_ids"],
+                "price_coverage_ratio": snapshot["data_quality"]["coverage"]["price_coverage_ratio"],
                 "missing_price_symbols": snapshot["data_quality"]["missing_price_symbols"],
+                "insufficient_history_symbols": snapshot["data_quality"].get("insufficient_history_symbols", []),
             }
         )
     )

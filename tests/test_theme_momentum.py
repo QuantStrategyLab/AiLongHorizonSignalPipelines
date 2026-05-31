@@ -63,6 +63,7 @@ def test_theme_momentum_ranks_strong_broad_theme_first() -> None:
     assert [item["symbol"] for item in ranked[0]["top_symbols"]] == ["MU", "HBM2"]
     assert ranked[0]["momentum_score"] > ranked[1]["momentum_score"]
     assert snapshot["policy"]["execution_allowed"] is False
+    assert snapshot["data_quality"]["coverage"]["price_coverage_ratio"] == 1.0
 
 
 def test_theme_momentum_records_missing_price_coverage() -> None:
@@ -86,5 +87,8 @@ def test_theme_momentum_records_missing_price_coverage() -> None:
     snapshot = build_theme_momentum_snapshot(rows, themes=themes, exposures=exposures)
 
     assert snapshot["data_quality"]["missing_price_symbols"] == ["SMCI"]
+    assert snapshot["data_quality"]["coverage"]["configured_symbol_count"] == 2
+    assert snapshot["data_quality"]["coverage"]["priced_symbol_count"] == 1
+    assert snapshot["data_quality"]["coverage"]["price_coverage_ratio"] == 0.5
     assert snapshot["theme_ranks"][0]["component_count"] == 2
     assert snapshot["theme_ranks"][0]["priced_symbol_count"] == 1

@@ -133,6 +133,11 @@ def build_theme_momentum_snapshot(
         for symbol, symbol_rows in sorted(rows_by_symbol.items())
         if symbol_rows
     }
+    exposure_symbols = sorted({symbol.upper() for symbol in exposures})
+    priced_exposure_symbols = [symbol for symbol in exposure_symbols if symbol in symbol_scores]
+    insufficient_history_symbols = sorted(
+        symbol for symbol in priced_exposure_symbols if symbol_scores[symbol]["momentum_score"] is None
+    )
     latest_dates = [parse_price_date(item["as_of"]) for item in symbol_scores.values()]
     snapshot_as_of = (as_of_date or max(latest_dates)).isoformat() if latest_dates or as_of_date else dt.date.today().isoformat()
 
@@ -231,7 +236,16 @@ def build_theme_momentum_snapshot(
         },
         "theme_ranks": theme_ranks,
         "data_quality": {
+            "coverage": {
+                "configured_symbol_count": len(exposure_symbols),
+                "priced_symbol_count": len(priced_exposure_symbols),
+                "price_coverage_ratio": round_optional(
+                    len(priced_exposure_symbols) / len(exposure_symbols) if exposure_symbols else None
+                ),
+                "insufficient_history_symbol_count": len(insufficient_history_symbols),
+            },
             "missing_price_symbols": sorted(missing_price_symbols),
+            "insufficient_history_symbols": insufficient_history_symbols,
             "unranked_themes": sorted(unranked_themes),
         },
         "policy": {

@@ -84,6 +84,19 @@ plugin contract.
 6. Downstream runtimes must treat the artifact as advisory context only until a
    separate deterministic policy engine explicitly consumes it.
 
+
+## Name and Horizon Boundary
+
+The repository name remains acceptable for now because this repo owns the
+long-horizon AI shadow context and cross-sector theme research artifacts.
+Short/medium/long final recommendations are produced by
+`QuantAdvisorResearch`, not by this repository.
+
+If the theme-momentum layer later becomes broader than AI context, a future
+rename such as `LongHorizonResearchSignals` can be considered, but that should
+be a separate migration because GitHub repo links, cross-repo checkout paths,
+and documentation references would all need updates.
+
 ## GitHub Configuration
 
 The model API keys are centralized in `CodexAuditBridge`; do not add
@@ -263,5 +276,7 @@ failures are recorded in `data_quality.missing_price_symbols` by default;
 `--strict-downloads` turns those into hard failures.
 
 The snapshot records fixed 12-1m, 6-1m, and 3m momentum windows, breadth, risk
-penalties, top symbols per theme, and a policy block that keeps the artifact
-research-only.
+penalties, top symbols per theme, source metadata, and a policy block that keeps
+the artifact research-only. `data_quality.coverage` now records configured
+symbol count, priced symbol count, price coverage ratio, and symbols with
+insufficient price history.

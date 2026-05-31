@@ -138,3 +138,12 @@ The artifact is point-in-time research context.  It ranks themes and highlights
 strong members inside a theme, but it does not encode orders, target weights, or
 execution policy.  Future replay must consume saved snapshots rather than
 recomputing old theme ranks with revised constituents or revised weights.
+
+## Repository Name Decision
+
+Keep `AiLongHorizonSignalPipelines` for now. The short/medium/long final
+recommendation buckets live in `QuantAdvisorResearch`; this repository still
+provides long-horizon AI shadow context plus cross-sector theme artifacts. A
+rename to `LongHorizonResearchSignals` may be reasonable later, but it should be
+a deliberate migration because cross-repository workflow checkouts and public
+links would need updates.

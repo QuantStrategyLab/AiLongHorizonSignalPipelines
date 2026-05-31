@@ -68,6 +68,13 @@ data/output/signal_history/2026-05-28.json
 5. 所有 AI 生成的 artifact 必须保持 `mode=shadow`，并通过本地 schema validation。
 6. 下游系统在单独的确定性 policy engine 显式消费前，只能把 artifact 当作 advisory context。
 
+
+## 名称和周期边界
+
+当前暂不建议改仓库名。`AiLongHorizonSignalPipelines` 仍然准确描述了本仓库的核心职责：维护长周期 AI shadow context 和跨板块主题研究 artifact。短线/中线/长线最终推荐是在 `QuantAdvisorResearch` 里生成的，不由本仓库直接输出。
+
+如果后续主题动量层明显扩展成更通用的研究信号仓，可以单独评估改名，例如 `LongHorizonResearchSignals`。这需要迁移 GitHub 仓库链接、跨仓 checkout 路径和文档引用，不建议和本次数据质量增强混在一起做。
+
 ## GitHub 配置
 
 模型 API key 集中在 `CodexAuditBridge`；不要把 `OPENAI_API_KEY` 或 `ANTHROPIC_API_KEY` 放到本仓库。
@@ -216,6 +223,7 @@ python scripts/build_theme_momentum_snapshot.py \
 - `theme_ranks`：主题排名、动量分、breadth、风险惩罚和主题内 top symbols
 - `methodology`：固定窗口和权重，便于后续 walk-forward replay
 - `policy`：明确这是研究排序，不允许下单或仓位分配
+- `data_quality.coverage`：配置标的数、已有价格标的数、价格覆盖率和价格历史不足标的
 
 当前固定窗口：
 
