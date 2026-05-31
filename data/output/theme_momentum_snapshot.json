@@ -12,7 +12,7 @@
     "missing_price_symbols": [],
     "unranked_themes": []
   },
-  "generated_at": "2026-05-31T06:38:02.909145Z",
+  "generated_at": "2026-05-31T07:59:24.441781Z",
   "horizon": "medium",
   "horizon_window": "2-12 weeks",
   "horizon_window_label": "2-12\u5468",
@@ -299,14 +299,14 @@
         },
         {
           "momentum_score": 0.221092,
-          "return_12_1m": 0.472745,
+          "return_12_1m": 0.472746,
           "return_3m": -0.04101,
           "return_6_1m": 0.35469,
           "symbol": "XOM"
         },
         {
           "momentum_score": 0.189883,
-          "return_12_1m": 0.433763,
+          "return_12_1m": 0.433764,
           "return_3m": -0.014076,
           "return_6_1m": 0.263963,
           "symbol": "CVX"
@@ -343,7 +343,7 @@
         },
         {
           "momentum_score": 0.569675,
-          "return_12_1m": 1.186373,
+          "return_12_1m": 1.186374,
           "return_3m": 0.220836,
           "return_6_1m": 0.301353,
           "symbol": "GOOGL"
@@ -352,7 +352,7 @@
           "momentum_score": 0.296201,
           "return_12_1m": 0.537686,
           "return_3m": 0.378333,
-          "return_6_1m": 0.06722,
+          "return_6_1m": 0.067221,
           "symbol": "XLK"
         },
         {
@@ -364,7 +364,7 @@
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407193,
+          "return_12_1m": 0.407194,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -396,12 +396,12 @@
           "momentum_score": 0.296201,
           "return_12_1m": 0.537686,
           "return_3m": 0.378333,
-          "return_6_1m": 0.06722,
+          "return_6_1m": 0.067221,
           "symbol": "XLK"
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407193,
+          "return_12_1m": 0.407194,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -421,7 +421,7 @@
           "symbol": "PANW"
         },
         {
-          "momentum_score": -0.057702,
+          "momentum_score": -0.057701,
           "return_12_1m": 0.093439,
           "return_3m": 0.14889,
           "return_6_1m": -0.198102,
