@@ -1,10 +1,17 @@
 {
   "as_of": "2026-05-29",
   "data_quality": {
+    "coverage": {
+      "configured_symbol_count": 53,
+      "insufficient_history_symbol_count": 0,
+      "price_coverage_ratio": 1.0,
+      "priced_symbol_count": 53
+    },
+    "insufficient_history_symbols": [],
     "missing_price_symbols": [],
     "unranked_themes": []
   },
-  "generated_at": "2026-05-31T03:11:54.946408Z",
+  "generated_at": "2026-05-31T06:10:09.886536Z",
   "methodology": {
     "breadth_bonus_weight": 0.1,
     "drawdown_penalty_weight": 0.25,
@@ -58,11 +65,11 @@
       "breadth_3m": 1.0,
       "component_count": 2,
       "horizon": "6-24 months",
-      "momentum_score": 1.934749,
+      "momentum_score": 1.934748,
       "priced_symbol_count": 2,
       "rank": 1,
       "returns": {
-        "12_1m": 3.53508,
+        "12_1m": 3.535079,
         "3m": 0.98602,
         "6_1m": 0.920215
       },
@@ -142,7 +149,7 @@
         },
         {
           "momentum_score": 0.530472,
-          "return_12_1m": 1.123631,
+          "return_12_1m": 1.12363,
           "return_3m": 0.401055,
           "return_6_1m": 0.124369,
           "symbol": "AVGO"
@@ -232,7 +239,7 @@
           "momentum_score": 1.158946,
           "return_12_1m": 2.558427,
           "return_3m": 0.238908,
-          "return_6_1m": 0.588218,
+          "return_6_1m": 0.588217,
           "symbol": "VRT"
         },
         {
@@ -353,7 +360,7 @@
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407193,
+          "return_12_1m": 0.407194,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -390,7 +397,7 @@
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407193,
+          "return_12_1m": 0.407194,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -455,7 +462,7 @@
         },
         {
           "momentum_score": 0.096194,
-          "return_12_1m": 0.233644,
+          "return_12_1m": 0.233643,
           "return_3m": 0.046406,
           "return_6_1m": 0.035883,
           "symbol": "DIA"
@@ -501,7 +508,7 @@
           "momentum_score": 1.158946,
           "return_12_1m": 2.558427,
           "return_3m": 0.238908,
-          "return_6_1m": 0.588218,
+          "return_6_1m": 0.588217,
           "symbol": "VRT"
         },
         {
@@ -608,7 +615,7 @@
         },
         {
           "momentum_score": 0.096194,
-          "return_12_1m": 0.233644,
+          "return_12_1m": 0.233643,
           "return_3m": 0.046406,
           "return_6_1m": 0.035883,
           "symbol": "DIA"
