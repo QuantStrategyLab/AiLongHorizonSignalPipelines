@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from ai_long_horizon_signal_pipelines import SignalValidationError, validate_signal
+from ai_long_horizon_signal_pipelines import SignalValidationError, validate_signal  # noqa: E402
 
 
 DEFAULT_SIGNAL_PATH = Path("data/output/latest_signal.json")
