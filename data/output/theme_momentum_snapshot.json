@@ -4,7 +4,7 @@
     "missing_price_symbols": [],
     "unranked_themes": []
   },
-  "generated_at": "2026-05-30T18:06:47.435423Z",
+  "generated_at": "2026-05-31T03:11:54.946408Z",
   "methodology": {
     "breadth_bonus_weight": 0.1,
     "drawdown_penalty_weight": 0.25,
@@ -58,11 +58,11 @@
       "breadth_3m": 1.0,
       "component_count": 2,
       "horizon": "6-24 months",
-      "momentum_score": 1.934748,
+      "momentum_score": 1.934749,
       "priced_symbol_count": 2,
       "rank": 1,
       "returns": {
-        "12_1m": 3.535079,
+        "12_1m": 3.53508,
         "3m": 0.98602,
         "6_1m": 0.920215
       },
@@ -353,7 +353,7 @@
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407194,
+          "return_12_1m": 0.407193,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -390,7 +390,7 @@
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407194,
+          "return_12_1m": 0.407193,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
