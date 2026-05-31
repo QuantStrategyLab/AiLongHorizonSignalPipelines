@@ -1,5 +1,7 @@
 # ResearchSignalContextPipelines
 
+> ⚠️ 投资有风险，不构成投资建议，仅供学习交流用途。
+
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 Research-only signal context artifact repository for QuantStrategyLab.
