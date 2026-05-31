@@ -1,4 +1,5 @@
 {
+  "artifact_type": "medium_horizon_theme_context",
   "as_of": "2026-05-29",
   "data_quality": {
     "coverage": {
@@ -11,7 +12,10 @@
     "missing_price_symbols": [],
     "unranked_themes": []
   },
-  "generated_at": "2026-05-31T06:10:09.886536Z",
+  "generated_at": "2026-05-31T06:38:02.909145Z",
+  "horizon": "medium",
+  "horizon_window": "2-12 weeks",
+  "horizon_window_label": "2-12\u5468",
   "methodology": {
     "breadth_bonus_weight": 0.1,
     "drawdown_penalty_weight": 0.25,
@@ -37,7 +41,7 @@
   },
   "mode": "theme_momentum_snapshot",
   "policy": {
-    "downstream_use": "Theme momentum snapshot for research ranking and replay only; do not route to broker execution.",
+    "downstream_use": "Medium-horizon theme context for research ranking and replay only; do not route to broker execution.",
     "execution_allowed": false,
     "portfolio_allocation_allowed": false,
     "theme_rank_is_research_context_only": true
@@ -149,7 +153,7 @@
         },
         {
           "momentum_score": 0.530472,
-          "return_12_1m": 1.12363,
+          "return_12_1m": 1.123631,
           "return_3m": 0.401055,
           "return_6_1m": 0.124369,
           "symbol": "AVGO"
@@ -295,14 +299,14 @@
         },
         {
           "momentum_score": 0.221092,
-          "return_12_1m": 0.472746,
+          "return_12_1m": 0.472745,
           "return_3m": -0.04101,
           "return_6_1m": 0.35469,
           "symbol": "XOM"
         },
         {
           "momentum_score": 0.189883,
-          "return_12_1m": 0.433764,
+          "return_12_1m": 0.433763,
           "return_3m": -0.014076,
           "return_6_1m": 0.263963,
           "symbol": "CVX"
@@ -348,7 +352,7 @@
           "momentum_score": 0.296201,
           "return_12_1m": 0.537686,
           "return_3m": 0.378333,
-          "return_6_1m": 0.067221,
+          "return_6_1m": 0.06722,
           "symbol": "XLK"
         },
         {
@@ -360,7 +364,7 @@
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407194,
+          "return_12_1m": 0.407193,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -392,12 +396,12 @@
           "momentum_score": 0.296201,
           "return_12_1m": 0.537686,
           "return_3m": 0.378333,
-          "return_6_1m": 0.067221,
+          "return_6_1m": 0.06722,
           "symbol": "XLK"
         },
         {
           "momentum_score": 0.208315,
-          "return_12_1m": 0.407194,
+          "return_12_1m": 0.407193,
           "return_3m": 0.217278,
           "return_6_1m": 0.055991,
           "symbol": "QQQ"
@@ -462,7 +466,7 @@
         },
         {
           "momentum_score": 0.096194,
-          "return_12_1m": 0.233643,
+          "return_12_1m": 0.233644,
           "return_3m": 0.046406,
           "return_6_1m": 0.035883,
           "symbol": "DIA"
@@ -615,7 +619,7 @@
         },
         {
           "momentum_score": 0.096194,
-          "return_12_1m": 0.233643,
+          "return_12_1m": 0.233644,
           "return_3m": 0.046406,
           "return_6_1m": 0.035883,
           "symbol": "DIA"
