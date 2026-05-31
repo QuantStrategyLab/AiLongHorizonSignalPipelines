@@ -21,6 +21,10 @@ VOLATILITY_PENALTY_WEIGHT = 0.15
 DRAWDOWN_PENALTY_WEIGHT = 0.25
 BREADTH_BONUS_WEIGHT = 0.10
 DEFAULT_TOP_SYMBOLS = 5
+THEME_MOMENTUM_ARTIFACT_TYPE = "medium_horizon_theme_context"
+THEME_MOMENTUM_HORIZON = "medium"
+THEME_MOMENTUM_HORIZON_WINDOW = "2-12 weeks"
+THEME_MOMENTUM_HORIZON_WINDOW_ZH = "2-12周"
 
 
 def utc_now_iso() -> str:
@@ -218,6 +222,10 @@ def build_theme_momentum_snapshot(
         "as_of": snapshot_as_of,
         "generated_at": (generated_at or dt.datetime.now(dt.UTC)).isoformat().replace("+00:00", "Z"),
         "mode": "theme_momentum_snapshot",
+        "artifact_type": THEME_MOMENTUM_ARTIFACT_TYPE,
+        "horizon": THEME_MOMENTUM_HORIZON,
+        "horizon_window": THEME_MOMENTUM_HORIZON_WINDOW,
+        "horizon_window_label": THEME_MOMENTUM_HORIZON_WINDOW_ZH,
         "taxonomy_version": taxonomy_versions[0] if taxonomy_versions else "unknown",
         "methodology": {
             "windows": {
@@ -252,7 +260,7 @@ def build_theme_momentum_snapshot(
             "execution_allowed": False,
             "portfolio_allocation_allowed": False,
             "theme_rank_is_research_context_only": True,
-            "downstream_use": "Theme momentum snapshot for research ranking and replay only; do not route to broker execution.",
+            "downstream_use": "Medium-horizon theme context for research ranking and replay only; do not route to broker execution.",
         },
     }
 

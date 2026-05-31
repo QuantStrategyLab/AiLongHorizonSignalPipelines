@@ -97,6 +97,18 @@ rename such as `LongHorizonResearchSignals` can be considered, but that should
 be a separate migration because GitHub repo links, cross-repo checkout paths,
 and documentation references would all need updates.
 
+
+## Horizon Boundary
+
+This repository does not directly produce short-term buy/sell recommendations.
+The horizon split is:
+
+- Short term (`1-10 trading days`): handled by event evidence from `PoliticalEventTrackingResearch` plus deterministic Advisor rules. AI can explain context but should not decide short-term recommendations.
+- Medium term (`2-12 weeks`): represented by `theme_momentum_snapshot.json` as `medium_horizon_theme_context`, including theme momentum, breadth, and strong members inside each theme.
+- Long term (`1-3 years`): represented by `latest_signal.json` and `signal_history/*.json` as AI shadow context.
+
+`QuantAdvisorResearch` remains the only layer that combines these inputs into final short/medium/long recommendations.
+
 ## GitHub Configuration
 
 The model API keys are centralized in `CodexAuditBridge`; do not add
@@ -246,7 +258,8 @@ saved artifacts rather than regenerating historical AI judgments.
 ## Scheduled Theme Momentum Refresh
 
 `.github/workflows/theme_momentum_snapshot.yml` runs weekly before the advisor
-publication workflow. It builds `data/output/theme_momentum_snapshot.json` and,
+publication workflow. It builds `data/output/theme_momentum_snapshot.json` as
+`medium_horizon_theme_context` for the `2-12 weeks` horizon and,
 on scheduled runs, commits the changed snapshot back to the repository so
 `QuantAdvisorResearch` can consume a point-in-time artifact. Manual runs can pass
 `prices_path` to use an audited local CSV instead of Yahoo chart downloads.
@@ -275,7 +288,7 @@ If `--prices` is omitted, the script downloads Yahoo chart data.  Partial symbol
 failures are recorded in `data_quality.missing_price_symbols` by default;
 `--strict-downloads` turns those into hard failures.
 
-The snapshot records fixed 12-1m, 6-1m, and 3m momentum windows, breadth, risk
+The snapshot records `artifact_type=medium_horizon_theme_context`, horizon metadata, fixed 12-1m, 6-1m, and 3m momentum windows, breadth, risk
 penalties, top symbols per theme, source metadata, and a policy block that keeps
 the artifact research-only. `data_quality.coverage` now records configured
 symbol count, priced symbol count, price coverage ratio, and symbols with

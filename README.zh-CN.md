@@ -75,6 +75,17 @@ data/output/signal_history/2026-05-28.json
 
 如果后续主题动量层明显扩展成更通用的研究信号仓，可以单独评估改名，例如 `LongHorizonResearchSignals`。这需要迁移 GitHub 仓库链接、跨仓 checkout 路径和文档引用，不建议和本次数据质量增强混在一起做。
 
+
+## 短中长线边界
+
+本仓库不直接输出短线买卖推荐。周期分工保持如下：
+
+- 短线（1-10 个交易日）：由 `PoliticalEventTrackingResearch` 的事件和 `QuantAdvisorResearch` 的确定性规则处理；AI 只可作为解释背景，不直接决定短线。
+- 中线（2-12 周）：由本仓库的 `theme_momentum_snapshot.json` 提供 `medium_horizon_theme_context`，包括主题动量、主题广度和主题内强势标的。
+- 长线（1-3 年）：由本仓库的 `latest_signal.json` / `signal_history/*.json` 提供 AI shadow context。
+
+最终短线、中线、长线推荐统一由 `QuantAdvisorResearch` 合成，本仓库仍不下单、不配仓、不输出账户级建议。
+
 ## GitHub 配置
 
 模型 API key 集中在 `CodexAuditBridge`；不要把 `OPENAI_API_KEY` 或 `ANTHROPIC_API_KEY` 放到本仓库。
@@ -199,7 +210,7 @@ config/symbol_theme_exposure.csv
 
 ## 主题动量定时刷新
 
-`.github/workflows/theme_momentum_snapshot.yml` 每周在 Advisor 发布前运行，生成 `data/output/theme_momentum_snapshot.json`。定时运行时如果快照有变化，会提交回仓库，供 `QuantAdvisorResearch` 读取点时 artifact。手工运行可以传 `prices_path`，使用可审计的本地价格 CSV，而不是临时下载。
+`.github/workflows/theme_momentum_snapshot.yml` 每周在 Advisor 发布前运行，生成 `data/output/theme_momentum_snapshot.json`。该 artifact 明确标记为 `medium_horizon_theme_context`，对应中线 2-12 周主题上下文。定时运行时如果快照有变化，会提交回仓库，供 `QuantAdvisorResearch` 读取点时 artifact。手工运行可以传 `prices_path`，使用可审计的本地价格 CSV，而不是临时下载。
 
 Yahoo chart 下载仍然只是临时 fallback。使用本地价格 CSV 时，快照会记录来源和文件 hash。随机免费代理 IP 池不应进入稳定链路，因为它会增加 replay、数据质量和合规复核难度。
 
@@ -222,6 +233,8 @@ python scripts/build_theme_momentum_snapshot.py \
 
 - `theme_ranks`：主题排名、动量分、breadth、风险惩罚和主题内 top symbols
 - `methodology`：固定窗口和权重，便于后续 walk-forward replay
+- `artifact_type`：`medium_horizon_theme_context`，表示中线主题上下文，不是短线 AI 推荐
+- `horizon` / `horizon_window`：`medium` / `2-12 weeks`
 - `policy`：明确这是研究排序，不允许下单或仓位分配
 - `data_quality.coverage`：配置标的数、已有价格标的数、价格覆盖率和价格历史不足标的
 

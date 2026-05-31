@@ -104,6 +104,9 @@ def main() -> int:
             {
                 "output": str(output_path),
                 "as_of": snapshot["as_of"],
+                "artifact_type": snapshot.get("artifact_type", ""),
+                "horizon": snapshot.get("horizon", ""),
+                "horizon_window": snapshot.get("horizon_window", ""),
                 "ranked_theme_count": snapshot["summary"]["ranked_theme_count"],
                 "priced_symbol_count": snapshot["summary"]["priced_symbol_count"],
                 "top_theme_ids": snapshot["summary"]["top_theme_ids"],

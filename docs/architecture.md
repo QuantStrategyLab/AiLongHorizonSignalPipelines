@@ -117,6 +117,10 @@ This is the anti-overfit boundary:
 3. Replay only saved artifacts; never regenerate old model judgments.
 4. Treat theme bias as context, not as execution or allocation.
 
+## Horizon Boundary
+
+This repository should not directly produce short-term recommendations. Short-term (`1-10 trading days`) catalyst handling belongs to `PoliticalEventTrackingResearch` plus deterministic Advisor rules. `theme_momentum_snapshot.json` is explicitly a medium-horizon (`2-12 weeks`) theme context artifact, while `latest_signal.json` and `signal_history/*.json` remain long-horizon (`1-3 years`) AI shadow context. `QuantAdvisorResearch` is the final composition layer for short/medium/long recommendation buckets.
+
 ## Theme Momentum Snapshot
 
 A cross-sector theme ranking is produced separately from the static taxonomy.
@@ -134,10 +138,10 @@ Output path convention:
 data/output/theme_momentum_snapshot.json
 ```
 
-The artifact is point-in-time research context.  It ranks themes and highlights
-strong members inside a theme, but it does not encode orders, target weights, or
-execution policy.  Future replay must consume saved snapshots rather than
-recomputing old theme ranks with revised constituents or revised weights.
+The artifact is point-in-time medium-horizon research context.  It ranks themes and highlights
+strong members inside a theme, but it does not encode short-term recommendations,
+orders, target weights, or execution policy.  Future replay must consume saved
+snapshots rather than recomputing old theme ranks with revised constituents or revised weights.
 
 ## Repository Name Decision
 
