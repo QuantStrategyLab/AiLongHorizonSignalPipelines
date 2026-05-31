@@ -69,6 +69,13 @@ def _require_string_list(value: Any, name: str, *, allow_empty: bool = False) ->
     return result
 
 
+def _require_number_0_1(value: Any, name: str) -> None:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise SignalValidationError(f"{name} must be numeric")
+    if value < 0 or value > 1:
+        raise SignalValidationError(f"{name} must be between 0 and 1")
+
+
 def validate_signal(payload: Mapping[str, Any]) -> None:
     missing = [key for key in REQUIRED_TOP_LEVEL_KEYS if key not in payload]
     if missing:
@@ -94,17 +101,15 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
 
     if "theme_bias" in payload:
         _validate_bias_mapping(_require_mapping(payload["theme_bias"], "theme_bias"), "theme_bias")
+    if "symbol_bias" in payload:
+        _validate_bias_mapping(_require_mapping(payload["symbol_bias"], "symbol_bias"), "symbol_bias")
     if "symbol_theme_exposure" in payload:
         symbol_theme_exposure = _require_mapping(payload["symbol_theme_exposure"], "symbol_theme_exposure")
         for symbol, theme_ids in symbol_theme_exposure.items():
             _require_string(symbol, "symbol_theme_exposure key")
             _require_string_list(theme_ids, f"symbol_theme_exposure[{symbol!r}]")
 
-    confidence = payload["confidence"]
-    if not isinstance(confidence, (int, float)) or isinstance(confidence, bool):
-        raise SignalValidationError("confidence must be numeric")
-    if confidence < 0 or confidence > 1:
-        raise SignalValidationError("confidence must be between 0 and 1")
+    _require_number_0_1(payload["confidence"], "confidence")
 
     evidence = _require_mapping(payload["evidence"], "evidence")
     _require_string_list(evidence.get("sources"), "evidence.sources")
@@ -121,7 +126,22 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
 def _validate_bias_mapping(mapping: Mapping[str, Any], name: str) -> None:
     for key, bias in mapping.items():
         _require_string(key, f"{name} key")
-        if bias not in ALLOWED_BIAS_VALUES:
-            raise SignalValidationError(
-                f"{name}[{key!r}] must be one of: {', '.join(sorted(ALLOWED_BIAS_VALUES))}"
-            )
+        _validate_bias_value(bias, f"{name}[{key!r}]")
+
+
+def _validate_bias_value(value: Any, name: str) -> None:
+    if isinstance(value, str):
+        bias = value
+    else:
+        raw = _require_mapping(value, name)
+        bias = _require_string(raw.get("bias"), f"{name}.bias")
+        if "confidence" in raw:
+            _require_number_0_1(raw["confidence"], f"{name}.confidence")
+        for optional_key in ("rationale", "horizon"):
+            if optional_key in raw:
+                _require_string(raw[optional_key], f"{name}.{optional_key}")
+        for optional_list_key in ("risk_flags", "linked_themes"):
+            if optional_list_key in raw:
+                _require_string_list(raw[optional_list_key], f"{name}.{optional_list_key}", allow_empty=True)
+    if bias not in ALLOWED_BIAS_VALUES:
+        raise SignalValidationError(f"{name} must be one of: {', '.join(sorted(ALLOWED_BIAS_VALUES))}")

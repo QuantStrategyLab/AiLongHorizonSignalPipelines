@@ -178,6 +178,27 @@ data/output/signal_history/YYYY-MM-DD.json
 
 所有 artifacts 必须保持 shadow-only。它们不能编码券商订单、目标数量或实盘 allocation override。
 
+`candidate_bias` 和 `theme_bias` 支持两种写法。兼容旧的紧凑写法：
+
+```json
+{"MU": "watch"}
+```
+
+也支持更适合审计的结构化写法：
+
+```json
+{
+  "MU": {
+    "bias": "watch",
+    "confidence": 0.55,
+    "linked_themes": ["hbm_memory"],
+    "rationale": "只作为 shadow context，不是交易指令。"
+  }
+}
+```
+
+`symbol_bias` 是可选字段，使用同样结构表达单个 symbol 的长线背景。下游 Advisor 只把这些字段当作上下文，仍然禁止订单、目标股数和组合权重。
+
 ## Replay Contract
 
 历史验证必须 replay 已保存 signal artifacts，而不是让模型重新生成过去的判断。当前示例 policy 有意保持保守：

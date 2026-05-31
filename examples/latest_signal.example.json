@@ -58,10 +58,42 @@
     "downstream_use": "Shadow context only; deterministic policy must explicitly opt in before any future use."
   },
   "theme_bias": {
-    "ai_compute": "watch",
-    "hbm_memory": "watch",
-    "ai_server_infrastructure": "watch",
-    "foundry_semicap": "watch",
+    "ai_compute": {
+      "bias": "watch",
+      "confidence": 0.42,
+      "horizon": "1-3 years",
+      "rationale": "AI infrastructure demand is durable but requires valuation and capex review.",
+      "risk_flags": [
+        "valuation_sensitive"
+      ]
+    },
+    "hbm_memory": {
+      "bias": "positive",
+      "confidence": 0.58,
+      "horizon": "1-3 years",
+      "rationale": "HBM and high-end memory remain linked to AI server buildout.",
+      "risk_flags": [
+        "memory_cycle_risk"
+      ]
+    },
+    "ai_server_infrastructure": {
+      "bias": "watch",
+      "confidence": 0.5,
+      "horizon": "1-3 years",
+      "rationale": "AI server infrastructure demand remains visible but margins and order conversion need review.",
+      "risk_flags": [
+        "margin_risk"
+      ]
+    },
+    "foundry_semicap": {
+      "bias": "watch",
+      "confidence": 0.46,
+      "horizon": "1-3 years",
+      "rationale": "Foundry and semiconductor capital spending are long-cycle context themes.",
+      "risk_flags": [
+        "capex_cycle_risk"
+      ]
+    },
     "defense_aerospace": "watch",
     "healthcare_policy": "neutral",
     "energy_security": "neutral",
@@ -92,5 +124,34 @@
     "XLF": [
       "financial_market_infrastructure"
     ]
+  },
+  "symbol_bias": {
+    "MU": {
+      "bias": "watch",
+      "confidence": 0.54,
+      "linked_themes": [
+        "hbm_memory",
+        "ai_compute"
+      ],
+      "rationale": "HBM exposure is positive context, but memory cycle and valuation still need confirmation."
+    },
+    "INTC": {
+      "bias": "watch",
+      "confidence": 0.45,
+      "linked_themes": [
+        "foundry_semicap",
+        "ai_compute"
+      ],
+      "rationale": "Foundry and domestic semiconductor policy are long-horizon context, execution risk remains high."
+    },
+    "DELL": {
+      "bias": "watch",
+      "confidence": 0.47,
+      "linked_themes": [
+        "ai_server_infrastructure",
+        "ai_compute"
+      ],
+      "rationale": "AI server demand is relevant, while margin and backlog conversion need review."
+    }
   }
 }

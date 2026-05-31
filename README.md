@@ -215,6 +215,29 @@ data/output/signal_history/YYYY-MM-DD.json
 All artifacts must remain shadow-only. They cannot encode broker orders, target
 quantities, or live allocation overrides.
 
+`candidate_bias` and `theme_bias` may use either the legacy compact form:
+
+```json
+{"MU": "watch"}
+```
+
+or the structured audit form:
+
+```json
+{
+  "MU": {
+    "bias": "watch",
+    "confidence": 0.55,
+    "linked_themes": ["hbm_memory"],
+    "rationale": "Shadow context only; not a trade instruction."
+  }
+}
+```
+
+`symbol_bias` is optional and uses the same structured shape for symbol-specific
+long-horizon context. Downstream Advisor code treats these fields as context and
+still blocks orders, target quantities, and portfolio weights.
+
 ## Replay Contract
 
 Historical validation should replay stored signal artifacts instead of asking a

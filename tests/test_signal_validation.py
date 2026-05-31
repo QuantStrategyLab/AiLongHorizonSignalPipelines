@@ -53,9 +53,40 @@ def test_signal_accepts_optional_theme_bias_and_exposure() -> None:
     validate_signal(payload)
 
 
+def test_signal_accepts_structured_theme_and_symbol_bias() -> None:
+    payload = load_example()
+    payload["theme_bias"] = {
+        "hbm_memory": {
+            "bias": "positive",
+            "confidence": 0.62,
+            "horizon": "1-3 years",
+            "rationale": "HBM demand remains a long-horizon research context.",
+            "risk_flags": ["cycle_risk"],
+        }
+    }
+    payload["symbol_bias"] = {
+        "MU": {
+            "bias": "watch",
+            "confidence": 0.55,
+            "linked_themes": ["hbm_memory"],
+            "rationale": "Symbol-level shadow context remains watch-only.",
+        }
+    }
+
+    validate_signal(payload)
+
+
 def test_signal_rejects_invalid_theme_bias() -> None:
     payload = load_example()
     payload["theme_bias"] = {"hbm_memory": "hot"}
 
     with pytest.raises(SignalValidationError, match="theme_bias"):
+        validate_signal(payload)
+
+
+def test_signal_rejects_invalid_structured_bias_confidence() -> None:
+    payload = load_example()
+    payload["symbol_bias"] = {"MU": {"bias": "watch", "confidence": 1.5}}
+
+    with pytest.raises(SignalValidationError, match="confidence"):
         validate_signal(payload)

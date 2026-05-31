@@ -106,16 +106,17 @@ The taxonomy intentionally covers multiple durable sectors:
 - consumer platforms, industrial automation, EV/auto, and crypto infrastructure
 
 Theme membership is static research context.  A symbol is not added to a theme
-just because it is hot this month.  Monthly AI output may express `theme_bias`,
-but downstream consumers must keep that output shadow-only and replay saved
-artifacts point-in-time.
+just because it is hot this month.  Monthly AI output may express `theme_bias`
+and optional `symbol_bias`; both can use structured values with bias,
+confidence, linked themes, rationale, and risk flags. Downstream consumers must
+keep that output shadow-only and replay saved artifacts point-in-time.
 
 This is the anti-overfit boundary:
 
 1. Define universe and theme exposure before looking at future returns.
 2. Save every AI theme judgment as an artifact.
 3. Replay only saved artifacts; never regenerate old model judgments.
-4. Treat theme bias as context, not as execution or allocation.
+4. Treat theme and symbol bias as context, not as execution or allocation.
 
 ## Horizon Boundary
 
