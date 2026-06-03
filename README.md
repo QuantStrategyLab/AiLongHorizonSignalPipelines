@@ -1,364 +1,64 @@
 # ResearchSignalContextPipelines
 
-<!-- qsl-doc-overview:start -->
+[Chinese README](README.zh-CN.md)
 
-> ⚠️ 投资有风险，不构成投资建议，仅供学习交流用途。
 > ⚠️ Investing involves risk. This project does not provide investment advice and is for educational and research purposes only.
 
-## Open-source overview / 开源项目入口
+## What this project does
 
-| Item | Description |
-| --- | --- |
-| Project type | research pipeline |
-| What it does | Builds research signal context artifacts for medium-horizon themes and AI shadow context. |
-| 中文说明 | 研究信号上下文管线，输出主题、价格、波动和回撤等可审计上下文 artifact。 |
-| Current status | Research-only. Outputs are context inputs, not orders or allocation instructions. |
+ResearchSignalContextPipelines is a **Research context pipeline** in the QuantStrategyLab ecosystem. It builds research signal context artifacts for medium-horizon themes and long-horizon AI shadow context.
 
-### Quick start
+## Who this is for
 
-- `python -m pip install -e '.[test]'`
-- `python -m pytest -q`
+- Engineers and researchers who want to inspect, reproduce, or extend this part of the QuantStrategyLab stack.
+- Operators who need a clear entry point before reading the deeper runbooks or workflow files.
+- Reviewers who need to understand the repository purpose, safety boundary, and evidence requirements before enabling automation.
 
-### Deploy / operate safely
+## Current status
 
-Use scheduled/report workflows only after confirming source freshness; do not connect outputs directly to execution.
+Research-only artifact pipeline; outputs are context, not trade instructions.
 
-### Strategy performance / evidence boundary
+## Repository layout
 
-See `docs/architecture.md` and overlay backtest tests for drawdown and overlay evaluation mechanics.
+- `src/`: main library and runtime code.
+- `tests/`: unit and contract tests.
+- `docs/`: detailed design notes, runbooks, and evidence docs.
+- `.github/workflows/`: CI, scheduled jobs, and deployment workflows.
+- `scripts/`: operator scripts and local helpers.
 
-> Detailed runbooks, migration notes, workflow internals, and historical decisions are kept below. Start with this overview before using the lower-level operational sections.
+## Quick start
 
-<!-- qsl-doc-overview:end -->
-
-> ⚠️ 投资有风险，不构成投资建议，仅供学习交流用途。
-
-
-## 中文摘要
-
-- 完整中文版见 [`README.zh-CN.md`](README.zh-CN.md)；本节保留在英文文件顶部，方便从当前文件直接找到中文入口。
-- 用途：本文档围绕 `ResearchSignalContextPipelines`，用于理解 `ResearchSignalContextPipelines` 的配置、运行、部署、研究或验收边界。
-- 主要覆盖：`Repository Role`、`Boundary`、`Current Status`、`Operating Model`、`Name and Horizon Boundary`。
-- 阅读顺序：先确认边界、输入输出和权限要求，再执行文档里的命令、CI、dry-run、发布或切换步骤。
-- 风险提示：涉及实盘、密钥、权限、Cloud Run、交易所或券商 API 的变更，必须先在测试环境或 dry-run 验证；不要只凭示例直接修改生产。
-- 英文正文保留更完整的命令、字段名和配置键；如果摘要和正文不一致，以正文中的实际命令和配置为准。
-[English](README.md) | [简体中文](README.zh-CN.md)
-
-Research-only signal context artifact repository for QuantStrategyLab.
-
-Current schema validation requires newly generated and promoted shadow signal
-artifacts to use the `1-3 years` horizon. Older pre-contract artifacts may keep
-their original point-in-time horizon text, but they should be treated as legacy
-records and not promoted as the current `latest_signal.json`.
-
-This repository does not place trades, store broker credentials, or own live
-allocation policy. It prepares and validates shadow signal artifacts that can
-later be consumed by sidecar plugins after a separate review and promotion
-process.
-
-## Repository Role
-
-This is a research artifact repository, not an agent runner, model gateway,
-execution service, or strategy plugin repository.
-
-Its job is to keep point-in-time research evidence reproducible:
-
-- build current-market context bundles
-- create dated GitHub Issues for operator review
-- store schema-valid shadow AI signal artifacts
-- preserve `signal_history` for future walk-forward replay
-- provide deterministic replay tooling around saved artifacts
-
-`CodexAuditBridge` remains the only bridge/runner for model providers and
-cross-repository write automation. Future live or notification behavior belongs
-in a separate deterministic plugin after the shadow artifacts have enough
-evidence.
-
-## Boundary
-
-This repo owns:
-
-- long-horizon AI context bundle examples
-- shadow signal JSON schema expectations
-- validation tooling for `latest_signal.json`
-- issue/workflow handoff to `QuantStrategyLab/CodexAuditBridge`
-- replay-ready artifact records for later research review
-
-This repo does not own:
-
-- broker API access
-- order placement
-- live portfolio allocation
-- deterministic strategy rules in `UsEquityStrategies`
-- runtime plugin execution in `QuantStrategyPlugins`
-- API keys for model providers
-- Codex/OpenAI/Anthropic provider routing
-- GitHub App token minting for source repository writes
-- Telegram or broker-facing runtime notifications
-
-## Current Status
-
-This repository is in shadow research accumulation mode. The first saved
-point-in-time artifact is `data/output/signal_history/2026-05-28.json`; the
-current promoted artifact is `data/output/signal_history/2026-05-31.json` and
-uses the long-horizon contract.
-
-Near-term work should focus on:
-
-- keeping the monthly workflow healthy
-- accumulating saved `signal_history/*.json` artifacts
-- replaying only saved artifacts, not regenerated historical AI judgments
-- improving context quality before any downstream plugin integration
-
-Do not promote the output into runtime allocation or notifications until the
-saved artifact history has enough walk-forward evidence to justify a separate
-plugin contract.
-
-## Operating Model
-
-1. A monthly workflow builds a point-in-time context bundle from current market
-   prices.
-2. The workflow creates or updates a dated long-horizon shadow-signal issue and
-   embeds the context bundle as review evidence.
-3. The issue is dispatched to `QuantStrategyLab/CodexAuditBridge` with task
-   `long_horizon_signal_shadow`.
-4. `CodexAuditBridge` tries self-hosted Codex first and uses its own OpenAI or
-   Anthropic API fallback only when configured.
-5. Any AI-generated artifact must remain `mode=shadow` and pass local schema
-   validation.
-6. Downstream runtimes must treat the artifact as advisory context only until a
-   separate deterministic policy engine explicitly consumes it.
-
-
-## Name and Horizon Boundary
-
-`ResearchSignalContextPipelines` is the canonical repository name for this layer.
-The name reflects its actual responsibility: maintaining reusable research
-context artifacts, including medium-horizon theme momentum and long-horizon AI
-shadow context. Short/medium/long final recommendations are still produced by
-`QuantAdvisorResearch`, not by this repository.
-
-
-## Horizon Boundary
-
-This repository does not directly produce short-term buy/sell recommendations.
-The horizon split is:
-
-- Short term (`1-10 trading days`): handled by event evidence from `PoliticalEventTrackingResearch` plus deterministic Advisor rules. AI can explain context but should not decide short-term recommendations.
-- Medium term (`2-12 weeks`): represented by `theme_momentum_snapshot.json` as `medium_horizon_theme_context`, including theme momentum, breadth, and strong members inside each theme.
-- Long term (`1-3 years`): represented by `latest_signal.json` and `signal_history/*.json` as AI shadow context.
-
-`QuantAdvisorResearch` remains the only layer that combines these inputs into final short/medium/long recommendations.
-
-## GitHub Configuration
-
-The model API keys are centralized in `CodexAuditBridge`; do not add
-`OPENAI_API_KEY` or `ANTHROPIC_API_KEY` to this repository.
-
-This repository needs only dispatch credentials for the bridge workflow:
-
-- preferred: `CROSS_REPO_GITHUB_APP_ID` variable and
-  `CROSS_REPO_GITHUB_APP_PRIVATE_KEY` secret with Actions write permission on
-  `CodexAuditBridge`
-- fallback: `CODEX_AUDIT_DISPATCH_TOKEN` secret with permission to dispatch the
-  bridge workflow
-
-Configured non-secret variables:
-
-- `SELFHOSTED_CODEX_REVIEW_REPOSITORY=QuantStrategyLab/CodexAuditBridge`
-- `SELFHOSTED_CODEX_REVIEW_PROVIDER=auto`
-- `CROSS_REPO_GITHUB_APP_ID=3250578`
-
-## Notification Policy
-
-The GitHub issue created by `.github/workflows/dispatch_shadow_signal.yml` is the
-initial operator notification channel. It is labeled `long-horizon-shadow`,
-deduplicated by date, and receives the CodexAuditBridge result as comments or a
-focused PR.
-
-Do not add Telegram, broker, or runtime plugin notifications at this stage. Those
-belong downstream only after the signal graduates from shadow research to a
-deterministic plugin contract.
-
-## Local Validation
-
-Validate the example artifact:
+From a fresh clone:
 
 ```bash
-python scripts/validate_latest_signal.py examples/latest_signal.example.json
+python -m pip install -e .
+python -m pytest -q
 ```
 
-Build a context bundle from a local price file:
+If a command requires credentials, run it only after reading the relevant workflow or runbook and configuring secrets outside Git.
 
-```bash
-python scripts/build_context_bundle.py \
-  --prices examples/price_history.example.csv \
-  --symbols QQQ \
-  --output data/output/context_bundle/latest_context_bundle.json
-```
+## Deployment and operation
 
-Without `--prices`, the script downloads recent daily prices for the default
-universe through Yahoo's chart endpoint and writes a point-in-time context bundle
-for the monthly shadow issue. The scheduled workflow uses
-`--allow-download-errors`, so external data-source failures still create an
-operator issue with the failure recorded instead of silently skipping the run.
+Run the configured workflows or local commands to refresh artifacts. Review source coverage and artifact diffs before publishing downstream.
 
-Validate the promoted latest artifact when it exists:
+Prefer manual or dry-run execution first. Enable schedules or live execution only after logs, artifacts, permissions, and rollback steps are reviewed.
 
-```bash
-python scripts/validate_latest_signal.py
-```
+## Strategy performance and evidence
 
-Run the synthetic overlay replay:
+Not a trading strategy repository. Evidence quality is measured by source traceability, freshness, and downstream review usefulness.
 
-```bash
-python scripts/backtest_signal_overlay.py \
-  --prices examples/price_history.example.csv \
-  --signals examples/signal_history \
-  --symbol QQQ
-```
+README files are intentionally not a source of dated performance promises. Re-run the relevant tests, backtests, or pipeline jobs before relying on any result.
 
-The replay tests a deterministic risk-reducing overlay only. It does not call
-AI models and does not treat the example as production evidence.
+## Safety notes
 
-Extract compact real-price input from an existing QuantStrategyLab price file:
+- Never commit API keys, broker credentials, OAuth tokens, cookies, or account identifiers.
+- Run new strategies and platform changes in dry-run or paper mode before any live execution.
+- Review generated orders, artifacts, and logs manually before enabling schedules.
 
-```bash
-python scripts/extract_price_history.py \
-  --source ../UsEquitySnapshotPipelines/data/output/tqqq_growth_income_real_full_archive_2026-05-26/price_history.csv \
-  --target data/input/qqq_price_history.csv \
-  --symbols QQQ
-```
+## Contributing
 
-Then replay stored shadow signals against those prices:
-
-```bash
-python scripts/backtest_signal_overlay.py \
-  --prices data/input/qqq_price_history.csv \
-  --signals data/output/signal_history \
-  --symbol QQQ \
-  --output data/output/tmp/replay_summary.json
-```
-
-The price loader accepts both this repository's compact `date,symbol,close`
-schema and the existing QuantStrategyLab `symbol,as_of,close` schema.
-
-## Artifact Contract
-
-The latest artifact path is:
-
-```text
-data/output/latest_signal.json
-```
-
-Historical generated copies can be stored under:
-
-```text
-data/output/signal_history/YYYY-MM-DD.json
-```
-
-All promoted latest artifacts must use `horizon: "1-3 years"`. To support
-Advisor long-horizon buckets, current artifacts should also include versioned
-theme context through `theme_bias`, `symbol_theme_exposure`, and optional
-`symbol_bias` for symbols that need explicit long-context coverage.
-
-All artifacts must remain shadow-only. They cannot encode broker orders, target
-quantities, or live allocation overrides.
-
-`candidate_bias` and `theme_bias` may use either the legacy compact form:
-
-```json
-{"MU": "watch"}
-```
-
-or the structured audit form:
-
-```json
-{
-  "MU": {
-    "bias": "watch",
-    "confidence": 0.55,
-    "linked_themes": ["hbm_memory"],
-    "rationale": "Shadow context only; not a trade instruction."
-  }
-}
-```
-
-`symbol_bias` is optional and uses the same structured shape for symbol-specific
-long-horizon context. Downstream Advisor code treats these fields as context and
-still blocks orders, target quantities, and portfolio weights.
-
-## Replay Contract
-
-Historical validation should replay stored signal artifacts instead of asking a
-model to re-create old judgments. The current example policy is intentionally
-conservative:
-
-- no active signal: keep baseline exposure
-- `confidence < 0.55`: no-op
-- `risk_off`: reduce exposure to `0.5`
-- `mixed`: reduce exposure to `0.8`
-- severe risk flags such as `liquidity_stress` cap exposure at `0.6`
-- the overlay never increases exposure above the baseline
+Keep changes small, reproducible, and covered by the narrowest useful tests. For strategy-facing changes, include the evidence artifact or command used to validate behavior.
 
 ## License
 
-This repository is licensed under the MIT License. See [LICENSE](LICENSE).
-
-## Cross-Sector Theme Universe
-
-The repository now keeps a static, versioned cross-sector theme universe instead
-of limiting long-horizon research to the current AI trade:
-
-```text
-config/theme_taxonomy.csv
-config/symbol_theme_exposure.csv
-```
-
-The taxonomy covers AI compute, HBM/memory, foundry policy, AI servers,
-data-center power, cybersecurity, defense/aerospace, energy security, clean grid,
-financial infrastructure, healthcare policy, consumer platforms, industrial
-automation, crypto infrastructure, and EV/auto transition.
-
-Theme membership is research context, not a hot-list override.  Monthly context
-bundles embed `theme_context`; downstream use remains shadow-only and must replay
-saved artifacts rather than regenerating historical AI judgments.
-
-## Scheduled Theme Momentum Refresh
-
-`.github/workflows/theme_momentum_snapshot.yml` runs weekly before the advisor
-publication workflow. It builds `data/output/theme_momentum_snapshot.json` as
-`medium_horizon_theme_context` for the `2-12 weeks` horizon and,
-on scheduled runs, commits the changed snapshot back to the repository so
-`QuantAdvisorResearch` can consume a point-in-time artifact. Manual runs can pass
-`prices_path` to use an audited local CSV instead of Yahoo chart downloads.
-
-Yahoo chart downloads remain a temporary fallback only. The snapshot records
-source metadata and file hashes when a local price CSV is used. Random free proxy
-pools should not be used in this stable pipeline because they make replay, data
-quality, and compliance review harder.
-
-## Theme Momentum Snapshot
-
-The static taxonomy only defines long-horizon theme membership.  Ranking is done
-by a separate theme momentum snapshot so the universe and weights are not changed
-just because a currently popular symbol has moved.
-
-Build from a local price CSV:
-
-```bash
-python scripts/build_theme_momentum_snapshot.py \
-  --prices data/input/theme_price_history.csv \
-  --symbols MU,INTC,DELL,NVDA,VRT,UNH,XOM,JPM,LMT \
-  --output data/output/theme_momentum_snapshot.json
-```
-
-If `--prices` is omitted, the script downloads Yahoo chart data.  Partial symbol
-failures are recorded in `data_quality.missing_price_symbols` by default;
-`--strict-downloads` turns those into hard failures.
-
-The snapshot records `artifact_type=medium_horizon_theme_context`, horizon metadata, fixed 12-1m, 6-1m, and 3m momentum windows, breadth, risk
-penalties, top symbols per theme, source metadata, and a policy block that keeps
-the artifact research-only. `data_quality.coverage` now records configured
-symbol count, priced symbol count, price coverage ratio, and symbols with
-insufficient price history.
+See [LICENSE](LICENSE) if present in this repository.
