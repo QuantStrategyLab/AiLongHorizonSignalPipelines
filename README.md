@@ -1,5 +1,36 @@
 # ResearchSignalContextPipelines
 
+<!-- qsl-doc-overview:start -->
+
+> ⚠️ 投资有风险，不构成投资建议，仅供学习交流用途。
+> ⚠️ Investing involves risk. This project does not provide investment advice and is for educational and research purposes only.
+
+## Open-source overview / 开源项目入口
+
+| Item | Description |
+| --- | --- |
+| Project type | research pipeline |
+| What it does | Builds research signal context artifacts for medium-horizon themes and AI shadow context. |
+| 中文说明 | 研究信号上下文管线，输出主题、价格、波动和回撤等可审计上下文 artifact。 |
+| Current status | Research-only. Outputs are context inputs, not orders or allocation instructions. |
+
+### Quick start
+
+- `python -m pip install -e '.[test]'`
+- `python -m pytest -q`
+
+### Deploy / operate safely
+
+Use scheduled/report workflows only after confirming source freshness; do not connect outputs directly to execution.
+
+### Strategy performance / evidence boundary
+
+See `docs/architecture.md` and overlay backtest tests for drawdown and overlay evaluation mechanics.
+
+> Detailed runbooks, migration notes, workflow internals, and historical decisions are kept below. Start with this overview before using the lower-level operational sections.
+
+<!-- qsl-doc-overview:end -->
+
 > ⚠️ 投资有风险，不构成投资建议，仅供学习交流用途。
 
 
