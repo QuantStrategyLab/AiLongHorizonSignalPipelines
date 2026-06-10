@@ -27,9 +27,14 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   dispatch-shadow-signal:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       BRIDGE_REPOSITORY: ${{ vars.SELFHOSTED_CODEX_REVIEW_REPOSITORY || 'QuantStrategyLab/CodexAuditBridge' }}
       BRIDGE_TASK: long_horizon_signal_shadow
