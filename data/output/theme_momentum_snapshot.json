@@ -1,6 +1,6 @@
 {
   "artifact_type": "medium_horizon_theme_context",
-  "as_of": "2026-06-05",
+  "as_of": "2026-06-12",
   "data_quality": {
     "coverage": {
       "configured_symbol_count": 53,
@@ -12,7 +12,7 @@
     "missing_price_symbols": [],
     "unranked_themes": []
   },
-  "generated_at": "2026-06-06T12:55:38.369452Z",
+  "generated_at": "2026-06-13T13:13:37.971176Z",
   "horizon": "medium",
   "horizon_window": "2-12 weeks",
   "horizon_window_label": "2-12\u5468",
@@ -69,17 +69,17 @@
       "breadth_3m": 1.0,
       "component_count": 2,
       "horizon": "6-24 months",
-      "momentum_score": 2.395116,
+      "momentum_score": 2.558846,
       "priced_symbol_count": 2,
       "rank": 1,
       "returns": {
-        "12_1m": 4.506921,
-        "3m": 1.001879,
-        "6_1m": 1.244798
+        "12_1m": 4.643093,
+        "3m": 1.052621,
+        "6_1m": 1.464102
       },
       "risk": {
-        "drawdown_126d": -0.161483,
-        "realized_vol_63d": 0.689538
+        "drawdown_126d": -0.061149,
+        "realized_vol_63d": 0.724633
       },
       "sector": "technology",
       "source_policy": "Prefer issuer filings, earnings transcripts, capex plans, and supply-chain primary evidence.",
@@ -87,17 +87,17 @@
       "theme_name": "HBM and memory cycle",
       "top_symbols": [
         {
-          "momentum_score": 3.717195,
-          "return_12_1m": 7.3087,
-          "return_3m": 1.334251,
-          "return_6_1m": 1.84252,
+          "momentum_score": 4.015703,
+          "return_12_1m": 7.728504,
+          "return_3m": 1.304513,
+          "return_6_1m": 2.175256,
           "symbol": "MU"
         },
         {
-          "momentum_score": 0.973037,
-          "return_12_1m": 1.705142,
-          "return_3m": 0.669508,
-          "return_6_1m": 0.647076,
+          "momentum_score": 1.001989,
+          "return_12_1m": 1.557682,
+          "return_3m": 0.800728,
+          "return_6_1m": 0.752947,
           "symbol": "SOXX"
         }
       ]
@@ -106,17 +106,17 @@
       "breadth_3m": 1.0,
       "component_count": 5,
       "horizon": "1-3 years",
-      "momentum_score": 1.326823,
+      "momentum_score": 1.355638,
       "priced_symbol_count": 5,
       "rank": 2,
       "returns": {
-        "12_1m": 2.402775,
-        "3m": 0.755057,
-        "6_1m": 0.738565
+        "12_1m": 2.232474,
+        "3m": 0.923133,
+        "6_1m": 0.847302
       },
       "risk": {
-        "drawdown_126d": -0.153414,
-        "realized_vol_63d": 0.621305
+        "drawdown_126d": -0.076315,
+        "realized_vol_63d": 0.637411
       },
       "sector": "technology",
       "source_policy": "Require SEC filings, government policy documents, grants, export-control notices, or issuer materials.",
@@ -124,38 +124,38 @@
       "theme_name": "Foundry and semiconductor policy",
       "top_symbols": [
         {
-          "momentum_score": 2.607364,
-          "return_12_1m": 4.575234,
-          "return_3m": 1.283971,
-          "return_6_1m": 1.861013,
+          "momentum_score": 2.794511,
+          "return_12_1m": 4.423354,
+          "return_3m": 1.721652,
+          "return_6_1m": 2.128479,
           "symbol": "INTC"
         },
         {
-          "momentum_score": 1.701051,
-          "return_12_1m": 3.189184,
-          "return_3m": 1.423635,
-          "return_6_1m": 0.622916,
+          "momentum_score": 1.818076,
+          "return_12_1m": 3.120422,
+          "return_3m": 1.645276,
+          "return_6_1m": 0.825969,
           "symbol": "AMD"
         },
         {
-          "momentum_score": 0.973037,
-          "return_12_1m": 1.705142,
-          "return_3m": 0.669508,
-          "return_6_1m": 0.647076,
+          "momentum_score": 1.001989,
+          "return_12_1m": 1.557682,
+          "return_3m": 0.800728,
+          "return_6_1m": 0.752947,
           "symbol": "SOXX"
         },
         {
-          "momentum_score": 0.671248,
-          "return_12_1m": 1.407572,
-          "return_3m": 0.22854,
-          "return_6_1m": 0.383644,
+          "momentum_score": 0.579668,
+          "return_12_1m": 1.164679,
+          "return_3m": 0.259555,
+          "return_6_1m": 0.361496,
           "symbol": "TSM"
         },
         {
-          "momentum_score": 0.431413,
-          "return_12_1m": 1.136743,
-          "return_3m": 0.169629,
-          "return_6_1m": 0.178177,
+          "momentum_score": 0.333947,
+          "return_12_1m": 0.896232,
+          "return_3m": 0.188451,
+          "return_6_1m": 0.16762,
           "symbol": "AVGO"
         }
       ]
@@ -164,17 +164,17 @@
       "breadth_3m": 0.857143,
       "component_count": 21,
       "horizon": "1-3 years",
-      "momentum_score": 0.67966,
+      "momentum_score": 0.703778,
       "priced_symbol_count": 21,
       "rank": 3,
       "returns": {
-        "12_1m": 1.359394,
-        "3m": 0.474193,
-        "6_1m": 0.287925
+        "12_1m": 1.305928,
+        "3m": 0.515454,
+        "6_1m": 0.384904
       },
       "risk": {
-        "drawdown_126d": -0.148053,
-        "realized_vol_63d": 0.547474
+        "drawdown_126d": -0.13458,
+        "realized_vol_63d": 0.561616
       },
       "sector": "technology",
       "source_policy": "Require issuer filings, IR releases, hyperscaler capex evidence, or durable industry data before recommendation escalation.",
@@ -182,57 +182,57 @@
       "theme_name": "AI compute platforms",
       "top_symbols": [
         {
-          "momentum_score": 3.717195,
-          "return_12_1m": 7.3087,
-          "return_3m": 1.334251,
-          "return_6_1m": 1.84252,
+          "momentum_score": 4.015703,
+          "return_12_1m": 7.728504,
+          "return_3m": 1.304513,
+          "return_6_1m": 2.175256,
           "symbol": "MU"
         },
         {
-          "momentum_score": 2.607364,
-          "return_12_1m": 4.575234,
-          "return_3m": 1.283971,
-          "return_6_1m": 1.861013,
+          "momentum_score": 2.794511,
+          "return_12_1m": 4.423354,
+          "return_3m": 1.721652,
+          "return_6_1m": 2.128479,
           "symbol": "INTC"
         },
         {
-          "momentum_score": 1.701051,
-          "return_12_1m": 3.189184,
-          "return_3m": 1.423635,
-          "return_6_1m": 0.622916,
+          "momentum_score": 1.818076,
+          "return_12_1m": 3.120422,
+          "return_3m": 1.645276,
+          "return_6_1m": 0.825969,
           "symbol": "AMD"
         },
         {
-          "momentum_score": 1.047182,
-          "return_12_1m": 1.569214,
-          "return_3m": 1.70078,
-          "return_6_1m": 0.502635,
+          "momentum_score": 1.031393,
+          "return_12_1m": 1.393909,
+          "return_3m": 1.617029,
+          "return_6_1m": 0.721878,
           "symbol": "DELL"
         },
         {
-          "momentum_score": 0.973037,
-          "return_12_1m": 1.705142,
-          "return_3m": 0.669508,
-          "return_6_1m": 0.647076,
+          "momentum_score": 1.001989,
+          "return_12_1m": 1.557682,
+          "return_3m": 0.800728,
+          "return_6_1m": 0.752947,
           "symbol": "SOXX"
         }
       ]
     },
     {
-      "breadth_3m": 1.0,
+      "breadth_3m": 0.75,
       "component_count": 4,
       "horizon": "6-24 months",
-      "momentum_score": 0.597361,
+      "momentum_score": 0.489888,
       "priced_symbol_count": 4,
       "rank": 4,
       "returns": {
-        "12_1m": 1.187224,
-        "3m": 0.668939,
-        "6_1m": 0.204772
+        "12_1m": 1.058406,
+        "3m": 0.49226,
+        "6_1m": 0.320448
       },
       "risk": {
-        "drawdown_126d": -0.165947,
-        "realized_vol_63d": 0.832981
+        "drawdown_126d": -0.249226,
+        "realized_vol_63d": 0.87593
       },
       "sector": "technology",
       "source_policy": "Require issuer releases, filings, customer demand evidence, or confirmed procurement data.",
@@ -240,31 +240,31 @@
       "theme_name": "AI server and data-center hardware",
       "top_symbols": [
         {
-          "momentum_score": 1.341755,
-          "return_12_1m": 2.789557,
-          "return_3m": 0.243203,
-          "return_6_1m": 0.876382,
+          "momentum_score": 1.310428,
+          "return_12_1m": 2.665981,
+          "return_3m": 0.170203,
+          "return_6_1m": 0.970912,
           "symbol": "VRT"
         },
         {
-          "momentum_score": 1.047182,
-          "return_12_1m": 1.569214,
-          "return_3m": 1.70078,
-          "return_6_1m": 0.502635,
+          "momentum_score": 1.031393,
+          "return_12_1m": 1.393909,
+          "return_3m": 1.617029,
+          "return_6_1m": 0.721878,
           "symbol": "DELL"
         },
         {
-          "momentum_score": 0.007624,
-          "return_12_1m": 0.312725,
-          "return_3m": 0.401845,
-          "return_6_1m": -0.242884,
+          "momentum_score": -0.099902,
+          "return_12_1m": 0.219081,
+          "return_3m": 0.191239,
+          "return_6_1m": -0.207216,
           "symbol": "ORCL"
         },
         {
-          "momentum_score": -0.207119,
-          "return_12_1m": 0.077401,
-          "return_3m": 0.329927,
-          "return_6_1m": -0.317044,
+          "momentum_score": -0.382366,
+          "return_12_1m": -0.045346,
+          "return_3m": -0.009431,
+          "return_6_1m": -0.203782,
           "symbol": "SMCI"
         }
       ]
@@ -273,17 +273,17 @@
       "breadth_3m": 0.777778,
       "component_count": 9,
       "horizon": "6-24 months",
-      "momentum_score": 0.209067,
+      "momentum_score": 0.219917,
       "priced_symbol_count": 9,
       "rank": 5,
       "returns": {
-        "12_1m": 0.544749,
-        "3m": 0.199025,
-        "6_1m": 0.050207
+        "12_1m": 0.507749,
+        "3m": 0.23257,
+        "6_1m": 0.105132
       },
       "risk": {
-        "drawdown_126d": -0.159233,
-        "realized_vol_63d": 0.427538
+        "drawdown_126d": -0.161432,
+        "realized_vol_63d": 0.436942
       },
       "sector": "communication_services",
       "source_policy": "Require issuer filings, platform policy evidence, app-store disclosures, or durable ad-market data.",
@@ -291,101 +291,57 @@
       "theme_name": "Consumer platforms and ads",
       "top_symbols": [
         {
-          "momentum_score": 0.698417,
-          "return_12_1m": 1.432374,
-          "return_3m": 0.235393,
-          "return_6_1m": 0.404838,
+          "momentum_score": 0.723576,
+          "return_12_1m": 1.549641,
+          "return_3m": 0.190601,
+          "return_6_1m": 0.389752,
           "symbol": "GOOGL"
         },
         {
-          "momentum_score": 0.662266,
-          "return_12_1m": 1.468164,
-          "return_3m": 0.539141,
-          "return_6_1m": 0.213668,
+          "momentum_score": 0.718433,
+          "return_12_1m": 1.353049,
+          "return_3m": 0.690576,
+          "return_6_1m": 0.375013,
           "symbol": "TQQQ"
         },
         {
-          "momentum_score": 0.293634,
-          "return_12_1m": 0.587317,
-          "return_3m": 0.314911,
-          "return_6_1m": 0.129473,
+          "momentum_score": 0.321567,
+          "return_12_1m": 0.562237,
+          "return_3m": 0.352557,
+          "return_6_1m": 0.200139,
           "symbol": "XLK"
         },
         {
-          "momentum_score": 0.215119,
-          "return_12_1m": 0.451873,
-          "return_3m": 0.194839,
-          "return_6_1m": 0.070649,
-          "symbol": "AAPL"
+          "momentum_score": 0.266791,
+          "return_12_1m": 0.434162,
+          "return_3m": 0.636897,
+          "return_6_1m": 0.256833,
+          "symbol": "QCOM"
         },
         {
-          "momentum_score": 0.210726,
-          "return_12_1m": 0.438763,
-          "return_3m": 0.177072,
-          "return_6_1m": 0.103571,
+          "momentum_score": 0.230575,
+          "return_12_1m": 0.414137,
+          "return_3m": 0.216482,
+          "return_6_1m": 0.149709,
           "symbol": "QQQ"
         }
       ]
     },
     {
-      "breadth_3m": 0.333333,
-      "component_count": 3,
-      "horizon": "6-24 months",
-      "momentum_score": 0.203606,
-      "priced_symbol_count": 3,
-      "rank": 6,
-      "returns": {
-        "12_1m": 0.459631,
-        "3m": 0.006497,
-        "6_1m": 0.289185
-      },
-      "risk": {
-        "drawdown_126d": -0.100896,
-        "realized_vol_63d": 0.27463
-      },
-      "sector": "energy",
-      "source_policy": "Require EIA/DOE/Treasury materials, issuer filings, official sanctions, or durable commodity context.",
-      "theme_id": "energy_security",
-      "theme_name": "Energy security and hydrocarbons",
-      "top_symbols": [
-        {
-          "momentum_score": 0.243743,
-          "return_12_1m": 0.461614,
-          "return_3m": 0.026106,
-          "return_6_1m": 0.312945,
-          "symbol": "XLE"
-        },
-        {
-          "momentum_score": 0.233924,
-          "return_12_1m": 0.489289,
-          "return_3m": -0.001802,
-          "return_6_1m": 0.32727,
-          "symbol": "XOM"
-        },
-        {
-          "momentum_score": 0.183151,
-          "return_12_1m": 0.427989,
-          "return_3m": -0.004814,
-          "return_6_1m": 0.22734,
-          "symbol": "CVX"
-        }
-      ]
-    },
-    {
-      "breadth_3m": 0.833333,
+      "breadth_3m": 1.0,
       "component_count": 6,
       "horizon": "1-3 years",
-      "momentum_score": 0.145799,
+      "momentum_score": 0.172941,
       "priced_symbol_count": 6,
-      "rank": 7,
+      "rank": 6,
       "returns": {
-        "12_1m": 0.330081,
-        "3m": 0.06983,
-        "6_1m": 0.077234
+        "12_1m": 0.28891,
+        "3m": 0.136126,
+        "6_1m": 0.098707
       },
       "risk": {
-        "drawdown_126d": -0.068976,
-        "realized_vol_63d": 0.312082
+        "drawdown_126d": -0.05477,
+        "realized_vol_63d": 0.316725
       },
       "sector": "industrials",
       "source_policy": "Require issuer backlog/capex evidence, government manufacturing policy, or official project data.",
@@ -393,115 +349,101 @@
       "theme_name": "Industrial automation and reshoring",
       "top_symbols": [
         {
-          "momentum_score": 0.233807,
-          "return_12_1m": 0.457176,
-          "return_3m": 0.1246,
-          "return_6_1m": 0.174518,
+          "momentum_score": 0.22203,
+          "return_12_1m": 0.374495,
+          "return_3m": 0.190118,
+          "return_6_1m": 0.164293,
           "symbol": "IWM"
         },
         {
-          "momentum_score": 0.156779,
-          "return_12_1m": 0.331257,
-          "return_3m": 0.02783,
-          "return_6_1m": 0.152684,
+          "momentum_score": 0.130852,
+          "return_12_1m": 0.254169,
+          "return_3m": 0.073034,
+          "return_6_1m": 0.132971,
           "symbol": "XLI"
         },
         {
-          "momentum_score": 0.115368,
-          "return_12_1m": 0.471469,
-          "return_3m": 0.016613,
-          "return_6_1m": -0.006462,
-          "symbol": "GE"
+          "momentum_score": 0.116,
+          "return_12_1m": 0.349686,
+          "return_3m": 0.287666,
+          "return_6_1m": 0.055461,
+          "symbol": "F"
         },
         {
-          "momentum_score": 0.107354,
-          "return_12_1m": 0.229319,
-          "return_3m": 0.0759,
-          "return_6_1m": 0.062087,
+          "momentum_score": 0.097792,
+          "return_12_1m": 0.19006,
+          "return_3m": 0.103472,
+          "return_6_1m": 0.057241,
           "symbol": "DIA"
         },
         {
-          "momentum_score": 0.034969,
-          "return_12_1m": 0.258132,
-          "return_3m": 0.241796,
-          "return_6_1m": -0.043499,
-          "symbol": "F"
+          "momentum_score": 0.08834,
+          "return_12_1m": 0.211908,
+          "return_3m": 0.043642,
+          "return_6_1m": 0.23505,
+          "symbol": "BA"
         }
       ]
     },
     {
-      "breadth_3m": 0.285714,
-      "component_count": 7,
-      "horizon": "1-3 years",
-      "momentum_score": 0.144233,
-      "priced_symbol_count": 7,
-      "rank": 8,
+      "breadth_3m": 0.333333,
+      "component_count": 3,
+      "horizon": "6-24 months",
+      "momentum_score": 0.165542,
+      "priced_symbol_count": 3,
+      "rank": 7,
       "returns": {
-        "12_1m": 0.839119,
-        "3m": 0.051597,
-        "6_1m": -0.058137
+        "12_1m": 0.405061,
+        "3m": -0.029369,
+        "6_1m": 0.272359
       },
       "risk": {
-        "drawdown_126d": -0.253461,
-        "realized_vol_63d": 0.661147
+        "drawdown_126d": -0.107374,
+        "realized_vol_63d": 0.273035
       },
-      "sector": "utilities",
-      "source_policy": "Require utility filings, regulator materials, power purchase agreements, issuer releases, or official project data.",
-      "theme_id": "data_center_power",
-      "theme_name": "Data-center power and cooling",
+      "sector": "energy",
+      "source_policy": "Require EIA/DOE/Treasury materials, issuer filings, official sanctions, or durable commodity context.",
+      "theme_id": "energy_security",
+      "theme_name": "Energy security and hydrocarbons",
       "top_symbols": [
         {
-          "momentum_score": 1.341755,
-          "return_12_1m": 2.789557,
-          "return_3m": 0.243203,
-          "return_6_1m": 0.876382,
-          "symbol": "VRT"
+          "momentum_score": 0.209174,
+          "return_12_1m": 0.406483,
+          "return_3m": 0.003917,
+          "return_6_1m": 0.294986,
+          "symbol": "XLE"
         },
         {
-          "momentum_score": 0.446297,
-          "return_12_1m": 2.126031,
-          "return_3m": -0.002747,
-          "return_6_1m": -0.371438,
-          "symbol": "OKLO"
+          "momentum_score": 0.186948,
+          "return_12_1m": 0.436221,
+          "return_3m": -0.051961,
+          "return_6_1m": 0.301936,
+          "symbol": "XOM"
         },
         {
-          "momentum_score": 0.175652,
-          "return_12_1m": 0.486035,
-          "return_3m": -0.050003,
-          "return_6_1m": 0.182328,
-          "symbol": "NEE"
-        },
-        {
-          "momentum_score": 0.03285,
-          "return_12_1m": 0.181917,
-          "return_3m": -0.0445,
-          "return_6_1m": 0.040368,
-          "symbol": "XLU"
-        },
-        {
-          "momentum_score": -0.00085,
-          "return_12_1m": 0.422715,
-          "return_3m": -0.014443,
-          "return_6_1m": -0.148686,
-          "symbol": "TSLA"
+          "momentum_score": 0.150505,
+          "return_12_1m": 0.372478,
+          "return_3m": -0.040063,
+          "return_6_1m": 0.220155,
+          "symbol": "CVX"
         }
       ]
     },
     {
-      "breadth_3m": 1.0,
+      "breadth_3m": 0.8,
       "component_count": 5,
       "horizon": "1-3 years",
-      "momentum_score": 0.115501,
+      "momentum_score": 0.161253,
       "priced_symbol_count": 5,
-      "rank": 9,
+      "rank": 8,
       "returns": {
-        "12_1m": 0.202849,
-        "3m": 0.345103,
-        "6_1m": -0.055412
+        "12_1m": 0.274489,
+        "3m": 0.355751,
+        "6_1m": 0.042996
       },
       "risk": {
-        "drawdown_126d": -0.106307,
-        "realized_vol_63d": 0.372959
+        "drawdown_126d": -0.098631,
+        "realized_vol_63d": 0.385811
       },
       "sector": "technology",
       "source_policy": "Require issuer filings, contract disclosures, government cybersecurity policy, or primary procurement evidence.",
@@ -509,38 +451,38 @@
       "theme_name": "Enterprise cybersecurity",
       "top_symbols": [
         {
-          "momentum_score": 0.293634,
-          "return_12_1m": 0.587317,
-          "return_3m": 0.314911,
-          "return_6_1m": 0.129473,
+          "momentum_score": 0.321567,
+          "return_12_1m": 0.562237,
+          "return_3m": 0.352557,
+          "return_6_1m": 0.200139,
           "symbol": "XLK"
         },
         {
-          "momentum_score": 0.210726,
-          "return_12_1m": 0.438763,
-          "return_3m": 0.177072,
-          "return_6_1m": 0.103571,
+          "momentum_score": 0.230575,
+          "return_12_1m": 0.414137,
+          "return_3m": 0.216482,
+          "return_6_1m": 0.149709,
           "symbol": "QQQ"
         },
         {
-          "momentum_score": -0.004612,
-          "return_12_1m": -0.023654,
-          "return_3m": 0.648288,
-          "return_6_1m": -0.162158,
+          "momentum_score": 0.161028,
+          "return_12_1m": 0.177209,
+          "return_3m": 0.674171,
+          "return_6_1m": 0.051953,
           "symbol": "PANW"
         },
         {
-          "momentum_score": -0.007558,
-          "return_12_1m": 0.055472,
-          "return_3m": 0.564186,
-          "return_6_1m": -0.151924,
+          "momentum_score": 0.146789,
+          "return_12_1m": 0.310008,
+          "return_3m": 0.545566,
+          "return_6_1m": 0.00904,
           "symbol": "CRWD"
         },
         {
-          "momentum_score": -0.164687,
-          "return_12_1m": -0.043655,
-          "return_3m": 0.021059,
-          "return_6_1m": -0.196021,
+          "momentum_score": -0.203695,
+          "return_12_1m": -0.091145,
+          "return_3m": -0.010021,
+          "return_6_1m": -0.19586,
           "symbol": "MSFT"
         }
       ]
@@ -549,17 +491,17 @@
       "breadth_3m": 1.0,
       "component_count": 2,
       "horizon": "6-24 months",
-      "momentum_score": 0.081981,
+      "momentum_score": 0.151705,
       "priced_symbol_count": 2,
-      "rank": 10,
+      "rank": 9,
       "returns": {
-        "12_1m": 0.0021,
-        "3m": 0.205699,
-        "6_1m": 0.065681
+        "12_1m": 0.093673,
+        "3m": 0.239625,
+        "6_1m": 0.13505
       },
       "risk": {
-        "drawdown_126d": -0.022584,
-        "realized_vol_63d": 0.250842
+        "drawdown_126d": -0.023394,
+        "realized_vol_63d": 0.247267
       },
       "sector": "healthcare",
       "source_policy": "Require CMS/HHS documents, SEC filings, issuer releases, or official policy evidence.",
@@ -567,94 +509,36 @@
       "theme_name": "Healthcare policy and managed care",
       "top_symbols": [
         {
-          "momentum_score": 0.063322,
-          "return_12_1m": -0.067126,
-          "return_3m": 0.405248,
-          "return_6_1m": 0.116342,
+          "momentum_score": 0.187926,
+          "return_12_1m": 0.089035,
+          "return_3m": 0.44819,
+          "return_6_1m": 0.265616,
           "symbol": "UNH"
         },
         {
-          "momentum_score": 0.00064,
-          "return_12_1m": 0.071327,
-          "return_3m": 0.006149,
-          "return_6_1m": 0.015019,
+          "momentum_score": 0.015483,
+          "return_12_1m": 0.098312,
+          "return_3m": 0.031059,
+          "return_6_1m": 0.004484,
           "symbol": "XLV"
         }
       ]
     },
     {
-      "breadth_3m": 0.777778,
-      "component_count": 9,
-      "horizon": "6-24 months",
-      "momentum_score": 0.019594,
-      "priced_symbol_count": 9,
-      "rank": 11,
-      "returns": {
-        "12_1m": 0.186719,
-        "3m": 0.007056,
-        "6_1m": -0.053653
-      },
-      "risk": {
-        "drawdown_126d": -0.124075,
-        "realized_vol_63d": 0.232253
-      },
-      "sector": "financials",
-      "source_policy": "Require regulatory filings, bank disclosures, market-structure rules, or durable volume and spread data.",
-      "theme_id": "financial_market_infrastructure",
-      "theme_name": "Financial and market infrastructure",
-      "top_symbols": [
-        {
-          "momentum_score": 0.233807,
-          "return_12_1m": 0.457176,
-          "return_3m": 0.1246,
-          "return_6_1m": 0.174518,
-          "symbol": "IWM"
-        },
-        {
-          "momentum_score": 0.150201,
-          "return_12_1m": 0.317177,
-          "return_3m": 0.09992,
-          "return_6_1m": 0.080002,
-          "symbol": "SPY"
-        },
-        {
-          "momentum_score": 0.107354,
-          "return_12_1m": 0.229319,
-          "return_3m": 0.0759,
-          "return_6_1m": 0.062087,
-          "symbol": "DIA"
-        },
-        {
-          "momentum_score": 0.091386,
-          "return_12_1m": 0.271081,
-          "return_3m": 0.084595,
-          "return_6_1m": 0.027765,
-          "symbol": "JPM"
-        },
-        {
-          "momentum_score": 0.025483,
-          "return_12_1m": 0.041354,
-          "return_3m": 0.009147,
-          "return_6_1m": 0.02066,
-          "symbol": "BOXX"
-        }
-      ]
-    },
-    {
-      "breadth_3m": 0.5,
+      "breadth_3m": 1.0,
       "component_count": 2,
       "horizon": "1-3 years",
-      "momentum_score": 0.017059,
+      "momentum_score": 0.13755,
       "priced_symbol_count": 2,
-      "rank": 12,
+      "rank": 10,
       "returns": {
-        "12_1m": 0.340423,
-        "3m": 0.113676,
-        "6_1m": -0.096092
+        "12_1m": 0.374118,
+        "3m": 0.163299,
+        "6_1m": 0.027776
       },
       "risk": {
-        "drawdown_126d": -0.173744,
-        "realized_vol_63d": 0.469738
+        "drawdown_126d": -0.159715,
+        "realized_vol_63d": 0.484762
       },
       "sector": "consumer_discretionary",
       "source_policy": "Require issuer filings, regulator safety data, tariff policy, official incentives, or durable delivery data.",
@@ -662,17 +546,17 @@
       "theme_name": "Automobility and EV transition",
       "top_symbols": [
         {
-          "momentum_score": 0.034969,
-          "return_12_1m": 0.258132,
-          "return_3m": 0.241796,
-          "return_6_1m": -0.043499,
+          "momentum_score": 0.116,
+          "return_12_1m": 0.349686,
+          "return_3m": 0.287666,
+          "return_6_1m": 0.055461,
           "symbol": "F"
         },
         {
-          "momentum_score": -0.00085,
-          "return_12_1m": 0.422715,
-          "return_3m": -0.014443,
-          "return_6_1m": -0.148686,
+          "momentum_score": 0.0591,
+          "return_12_1m": 0.398549,
+          "return_3m": 0.038931,
+          "return_6_1m": 9e-05,
           "symbol": "TSLA"
         }
       ]
@@ -681,17 +565,133 @@
       "breadth_3m": 0.285714,
       "component_count": 7,
       "horizon": "1-3 years",
-      "momentum_score": -0.040048,
+      "momentum_score": 0.067304,
+      "priced_symbol_count": 7,
+      "rank": 11,
+      "returns": {
+        "12_1m": 0.665645,
+        "3m": -0.012678,
+        "6_1m": -0.006053
+      },
+      "risk": {
+        "drawdown_126d": -0.27454,
+        "realized_vol_63d": 0.690684
+      },
+      "sector": "utilities",
+      "source_policy": "Require utility filings, regulator materials, power purchase agreements, issuer releases, or official project data.",
+      "theme_id": "data_center_power",
+      "theme_name": "Data-center power and cooling",
+      "top_symbols": [
+        {
+          "momentum_score": 1.310428,
+          "return_12_1m": 2.665981,
+          "return_3m": 0.170203,
+          "return_6_1m": 0.970912,
+          "symbol": "VRT"
+        },
+        {
+          "momentum_score": 0.163124,
+          "return_12_1m": 1.414558,
+          "return_3m": -0.015076,
+          "return_6_1m": -0.375359,
+          "symbol": "OKLO"
+        },
+        {
+          "momentum_score": 0.120771,
+          "return_12_1m": 0.401504,
+          "return_3m": -0.066395,
+          "return_6_1m": 0.134168,
+          "symbol": "NEE"
+        },
+        {
+          "momentum_score": 0.0591,
+          "return_12_1m": 0.398549,
+          "return_3m": 0.038931,
+          "return_6_1m": 9e-05,
+          "symbol": "TSLA"
+        },
+        {
+          "momentum_score": 0.010827,
+          "return_12_1m": 0.151984,
+          "return_3m": -0.045117,
+          "return_6_1m": 0.010915,
+          "symbol": "XLU"
+        }
+      ]
+    },
+    {
+      "breadth_3m": 0.777778,
+      "component_count": 9,
+      "horizon": "6-24 months",
+      "momentum_score": 0.007757,
+      "priced_symbol_count": 9,
+      "rank": 12,
+      "returns": {
+        "12_1m": 0.132477,
+        "3m": 0.046525,
+        "6_1m": -0.064533
+      },
+      "risk": {
+        "drawdown_126d": -0.106257,
+        "realized_vol_63d": 0.236614
+      },
+      "sector": "financials",
+      "source_policy": "Require regulatory filings, bank disclosures, market-structure rules, or durable volume and spread data.",
+      "theme_id": "financial_market_infrastructure",
+      "theme_name": "Financial and market infrastructure",
+      "top_symbols": [
+        {
+          "momentum_score": 0.22203,
+          "return_12_1m": 0.374495,
+          "return_3m": 0.190118,
+          "return_6_1m": 0.164293,
+          "symbol": "IWM"
+        },
+        {
+          "momentum_score": 0.150743,
+          "return_12_1m": 0.287877,
+          "return_3m": 0.123036,
+          "return_6_1m": 0.095528,
+          "symbol": "SPY"
+        },
+        {
+          "momentum_score": 0.097792,
+          "return_12_1m": 0.19006,
+          "return_3m": 0.103472,
+          "return_6_1m": 0.057241,
+          "symbol": "DIA"
+        },
+        {
+          "momentum_score": 0.04772,
+          "return_12_1m": 0.17704,
+          "return_3m": 0.137318,
+          "return_6_1m": -0.043366,
+          "symbol": "JPM"
+        },
+        {
+          "momentum_score": 0.025267,
+          "return_12_1m": 0.041325,
+          "return_3m": 0.00862,
+          "return_6_1m": 0.020467,
+          "symbol": "BOXX"
+        }
+      ]
+    },
+    {
+      "breadth_3m": 0.428571,
+      "component_count": 7,
+      "horizon": "1-3 years",
+      "momentum_score": -0.013976,
       "priced_symbol_count": 7,
       "rank": 13,
       "returns": {
-        "12_1m": 0.255338,
-        "3m": -0.112369,
-        "6_1m": -0.00446
+        "12_1m": 0.22904,
+        "3m": -0.060033,
+        "6_1m": 0.020175
       },
       "risk": {
-        "drawdown_126d": -0.16764,
-        "realized_vol_63d": 0.327944
+        "drawdown_126d": -0.160179,
+        "realized_vol_63d": 0.336382
       },
       "sector": "industrials",
       "source_policy": "Require DoD/agency awards, issuer backlog disclosures, budget documents, or official procurement records.",
@@ -699,38 +699,38 @@
       "theme_name": "Defense and aerospace",
       "top_symbols": [
         {
-          "momentum_score": 0.156779,
-          "return_12_1m": 0.331257,
-          "return_3m": 0.02783,
-          "return_6_1m": 0.152684,
+          "momentum_score": 0.130852,
+          "return_12_1m": 0.254169,
+          "return_3m": 0.073034,
+          "return_6_1m": 0.132971,
           "symbol": "XLI"
         },
         {
-          "momentum_score": 0.115368,
-          "return_12_1m": 0.471469,
-          "return_3m": 0.016613,
-          "return_6_1m": -0.006462,
-          "symbol": "GE"
-        },
-        {
-          "momentum_score": 0.054313,
-          "return_12_1m": 0.397648,
-          "return_3m": -0.133563,
-          "return_6_1m": 0.00558,
-          "symbol": "RTX"
-        },
-        {
-          "momentum_score": 0.026516,
-          "return_12_1m": 0.233133,
-          "return_3m": -0.06776,
-          "return_6_1m": 0.124077,
+          "momentum_score": 0.08834,
+          "return_12_1m": 0.211908,
+          "return_3m": 0.043642,
+          "return_6_1m": 0.23505,
           "symbol": "BA"
         },
         {
-          "momentum_score": -0.072162,
-          "return_12_1m": 0.120344,
-          "return_3m": -0.215224,
-          "return_6_1m": 0.067539,
+          "momentum_score": 0.082633,
+          "return_12_1m": 0.35314,
+          "return_3m": 0.118823,
+          "return_6_1m": -0.052777,
+          "symbol": "GE"
+        },
+        {
+          "momentum_score": 0.05821,
+          "return_12_1m": 0.387229,
+          "return_3m": -0.098893,
+          "return_6_1m": 0.002111,
+          "symbol": "RTX"
+        },
+        {
+          "momentum_score": -0.017458,
+          "return_12_1m": 0.128888,
+          "return_3m": -0.1581,
+          "return_6_1m": 0.164894,
           "symbol": "LMT"
         }
       ]
@@ -739,17 +739,17 @@
       "breadth_3m": 0.2,
       "component_count": 5,
       "horizon": "1-3 years",
-      "momentum_score": -0.046603,
+      "momentum_score": -0.124112,
       "priced_symbol_count": 5,
       "rank": 14,
       "returns": {
-        "12_1m": 0.478021,
-        "3m": 0.039246,
-        "6_1m": -0.120893
+        "12_1m": 0.303286,
+        "3m": -0.009948,
+        "6_1m": -0.106133
       },
       "risk": {
-        "drawdown_126d": -0.28518,
-        "realized_vol_63d": 0.693435
+        "drawdown_126d": -0.281769,
+        "realized_vol_63d": 0.702338
       },
       "sector": "utilities",
       "source_policy": "Require DOE/FERC/state regulator documents, issuer filings, or project-level evidence.",
@@ -757,38 +757,38 @@
       "theme_name": "Clean energy and grid transition",
       "top_symbols": [
         {
-          "momentum_score": 0.446297,
-          "return_12_1m": 2.126031,
-          "return_3m": -0.002747,
-          "return_6_1m": -0.371438,
+          "momentum_score": 0.163124,
+          "return_12_1m": 1.414558,
+          "return_3m": -0.015076,
+          "return_6_1m": -0.375359,
           "symbol": "OKLO"
         },
         {
-          "momentum_score": 0.175652,
-          "return_12_1m": 0.486035,
-          "return_3m": -0.050003,
-          "return_6_1m": 0.182328,
+          "momentum_score": 0.120771,
+          "return_12_1m": 0.401504,
+          "return_3m": -0.066395,
+          "return_6_1m": 0.134168,
           "symbol": "NEE"
         },
         {
-          "momentum_score": 0.03285,
-          "return_12_1m": 0.181917,
-          "return_3m": -0.0445,
-          "return_6_1m": 0.040368,
+          "momentum_score": 0.010827,
+          "return_12_1m": 0.151984,
+          "return_3m": -0.045117,
+          "return_6_1m": 0.010915,
           "symbol": "XLU"
         },
         {
-          "momentum_score": -0.10886,
-          "return_12_1m": -0.194057,
-          "return_3m": 0.393736,
-          "return_6_1m": 0.213148,
+          "momentum_score": -0.104526,
+          "return_12_1m": -0.123905,
+          "return_3m": 0.238711,
+          "return_6_1m": 0.278928,
           "symbol": "ENPH"
         },
         {
-          "momentum_score": -0.628954,
-          "return_12_1m": -0.209819,
-          "return_3m": -0.100257,
-          "return_6_1m": -0.668871,
+          "momentum_score": -0.660757,
+          "return_12_1m": -0.327712,
+          "return_3m": -0.161864,
+          "return_6_1m": -0.579318,
           "symbol": "SMR"
         }
       ]
@@ -797,17 +797,17 @@
       "breadth_3m": 0.0,
       "component_count": 2,
       "horizon": "3-18 months",
-      "momentum_score": -0.471514,
+      "momentum_score": -0.46312,
       "priced_symbol_count": 2,
       "rank": 15,
       "returns": {
-        "12_1m": -0.261948,
-        "3m": -0.162645,
-        "6_1m": -0.347512
+        "12_1m": -0.293233,
+        "3m": -0.147622,
+        "6_1m": -0.31
       },
       "risk": {
-        "drawdown_126d": -0.417928,
-        "realized_vol_63d": 0.666418
+        "drawdown_126d": -0.386686,
+        "realized_vol_63d": 0.691666
       },
       "sector": "financials",
       "source_policy": "Require SEC/CFTC/Treasury materials, issuer filings, exchange disclosures, or durable market data.",
@@ -815,17 +815,17 @@
       "theme_name": "Crypto infrastructure and digital assets",
       "top_symbols": [
         {
-          "momentum_score": -0.410022,
-          "return_12_1m": -0.007222,
-          "return_3m": -0.227259,
-          "return_6_1m": -0.400884,
+          "momentum_score": -0.38591,
+          "return_12_1m": -0.026156,
+          "return_3m": -0.182836,
+          "return_6_1m": -0.365269,
           "symbol": "COIN"
         },
         {
-          "momentum_score": -0.533006,
-          "return_12_1m": -0.516674,
-          "return_3m": -0.09803,
-          "return_6_1m": -0.29414,
+          "momentum_score": -0.540331,
+          "return_12_1m": -0.560311,
+          "return_3m": -0.112408,
+          "return_6_1m": -0.25473,
           "symbol": "MSTR"
         }
       ]
