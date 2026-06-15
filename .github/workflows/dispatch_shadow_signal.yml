@@ -36,7 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      BRIDGE_REPOSITORY: ${{ vars.SELFHOSTED_CODEX_REVIEW_REPOSITORY || 'QuantStrategyLab/CodexAuditBridge' }}
+      BRIDGE_REPOSITORY: ${{ vars.CODEX_AUDIT_BRIDGE_REPOSITORY || 'QuantStrategyLab/CodexAuditBridge' }}
+      BRIDGE_REF: ${{ vars.CODEX_AUDIT_BRIDGE_REF || 'main' }}
       BRIDGE_TASK: long_horizon_signal_shadow
       BRIDGE_PROVIDER: ${{ github.event.inputs.provider || 'auto' }}
       SOURCE_REF: ${{ github.event.inputs.source_ref || 'main' }}
@@ -146,7 +147,7 @@ jobs:
                   return response.status, json.loads(body) if body else None
 
           dispatch_payload = {
-              "ref": "main",
+              "ref": os.environ["BRIDGE_REF"],
               "inputs": {
                   "source_repo": repo,
                   "issue_number": os.environ["ISSUE_NUMBER"],
@@ -159,7 +160,7 @@ jobs:
           }
           status, _ = request(
               "POST",
-              f"https://api.github.com/repos/{bridge_repo}/actions/workflows/selfhosted_monthly_review.yml/dispatches",
+              f"https://api.github.com/repos/{bridge_repo}/actions/workflows/codex_audit.yml/dispatches",
               dispatch_payload,
               auth_token=dispatch_token,
           )
