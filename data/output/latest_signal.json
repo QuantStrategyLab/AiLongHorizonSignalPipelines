@@ -1,29 +1,51 @@
 {
-  "as_of": "2026-05-31",
-  "candidate_bias": {},
-  "confidence": 0.58,
-  "evidence": {
-    "data_gaps": [
-      "Issuer-level valuation, earnings, balance-sheet, and liquidity checks are not embedded in this artifact.",
-      "Policy/news events are supplied by PoliticalEventTrackingResearch and may be absent or low-scoring for otherwise strong theme and momentum candidates.",
-      "Historical AI judgments must come from saved point-in-time artifacts, not regenerated prompts."
-    ],
-    "sources": [
-      "config/theme_taxonomy.csv",
-      "config/symbol_theme_exposure.csv",
-      "data/output/theme_momentum_snapshot.json",
-      ".codex-audit/monthly_issue.md"
-    ],
-    "summary": "Long-horizon shadow context combines versioned theme taxonomy, static symbol-theme exposure, and the latest medium-horizon theme momentum snapshot. It is a research context artifact only, not an execution or allocation signal."
-  },
-  "expires_at": "2026-06-30",
-  "generated_at": "2026-05-31T10:52:51Z",
-  "horizon": "1-3 years",
+  "schema_version": "1",
+  "as_of": "2026-06-25",
+  "generated_at": "2026-06-27T08:22:28.245044Z",
   "mode": "shadow",
-  "policy": {
-    "downstream_use": "Research-only long-horizon context for QuantAdvisorResearch. Execution, account allocation, and broker routing remain blocked.",
-    "execution_allowed": false
-  },
+  "horizon": "1-3 years",
+  "universe": [
+    "SPY",
+    "QQQ",
+    "SOXX",
+    "TQQQ",
+    "BIL",
+    "BOXX",
+    "IWM",
+    "DIA",
+    "XLF",
+    "XLV",
+    "XLE",
+    "XLI",
+    "XLU",
+    "XLK",
+    "NVDA",
+    "AMD",
+    "AVGO",
+    "TSM",
+    "MU",
+    "INTC",
+    "DELL",
+    "SMCI",
+    "VRT",
+    "MSFT",
+    "GOOGL",
+    "AMZN",
+    "META",
+    "CRWD",
+    "PANW",
+    "LMT",
+    "RTX",
+    "NOC",
+    "CVX",
+    "XOM",
+    "JPM",
+    "UNH",
+    "NEE",
+    "TSLA",
+    "COIN",
+    "MSTR"
+  ],
   "regime": "mixed",
   "risk_flags": [
     "shadow_only_context",
@@ -31,8 +53,7 @@
     "requires_fundamental_and_valuation_review",
     "no_account_level_advice"
   ],
-  "schema_version": "1",
-  "symbol_bias": {
+  "candidate_bias": {
     "AMD": {
       "bias": "watch",
       "confidence": 0.57,
@@ -78,6 +99,26 @@
       ],
       "rationale": "Data-center power and cooling exposure remains a durable AI infrastructure context."
     }
+  },
+  "confidence": 0.58,
+  "evidence": {
+    "sources": [
+      "config/theme_taxonomy.csv",
+      "config/symbol_theme_exposure.csv",
+      "data/output/theme_momentum_snapshot.json",
+      ".codex-audit/monthly_issue.md"
+    ],
+    "summary": "Long-horizon shadow context combines versioned theme taxonomy, static symbol-theme exposure, and the latest medium-horizon theme momentum snapshot. It is a research context artifact only, not an execution or allocation signal.",
+    "data_gaps": [
+      "Issuer-level valuation, earnings, balance-sheet, and liquidity checks are not embedded in this artifact.",
+      "Policy/news events are supplied by PoliticalEventTrackingResearch and may be absent or low-scoring for otherwise strong theme and momentum candidates.",
+      "Historical AI judgments must come from saved point-in-time artifacts, not regenerated prompts."
+    ]
+  },
+  "expires_at": "2026-06-30",
+  "policy": {
+    "downstream_use": "Research-only long-horizon context for QuantAdvisorResearch. Execution, account allocation, and broker routing remain blocked unless a separate deterministic policy engine explicitly consumes this artifact under its own controls.",
+    "execution_allowed": false
   },
   "symbol_theme_exposure": {
     "AAPL": [
@@ -314,46 +355,5 @@
       "horizon": "1-3 years",
       "rationale": "Industrial automation remains a background context rather than a current positive signal."
     }
-  },
-  "universe": [
-    "AAPL",
-    "AMD",
-    "AMZN",
-    "AVGO",
-    "BA",
-    "COIN",
-    "CRWD",
-    "CVX",
-    "DELL",
-    "ENPH",
-    "F",
-    "GE",
-    "GOOGL",
-    "INTC",
-    "IONQ",
-    "JPM",
-    "LMT",
-    "META",
-    "MSFT",
-    "MSTR",
-    "MU",
-    "NEE",
-    "NOC",
-    "NVDA",
-    "OKLO",
-    "ORCL",
-    "PANW",
-    "PLTR",
-    "QCOM",
-    "RBLX",
-    "RTX",
-    "SMCI",
-    "SMR",
-    "SOFI",
-    "TSLA",
-    "TSM",
-    "UNH",
-    "VRT",
-    "XOM"
-  ]
+  }
 }
