@@ -6,7 +6,7 @@ QuantStrategyLab already separates strategy math, snapshot generation, runtime
 execution, and broker adapters. This repository adds a research-only signal context
 pipeline without changing that production boundary.
 
-This repository is deliberately narrower than `CodexAuditBridge`. It owns
+This repository is deliberately narrower than `AIAuditBridge`. It owns
 research inputs, validation, saved artifacts, and replay harnesses. It does not
 own model provider routing, API keys, GitHub App write orchestration, live
 notifications, or execution behavior.
@@ -21,7 +21,7 @@ order routing.
 
 - `ResearchSignalContextPipelines` stores context examples, schema, validation,
   replay tooling, and shadow artifacts.
-- `CodexAuditBridge` owns provider routing and API keys.
+- `AIAuditBridge` owns provider routing and API keys.
 - GitHub Issues are the first operator notification layer for monthly shadow
   signal runs.
 - The scheduled workflow builds the market context bundle before dispatching the
@@ -35,7 +35,7 @@ order routing.
 The current lifecycle is accumulation-first:
 
 1. Build a point-in-time context bundle.
-2. Ask `CodexAuditBridge` to review it and produce a shadow-only artifact when
+2. Ask `AIAuditBridge` to review it and produce a shadow-only artifact when
    evidence is sufficient.
 3. Save both `latest_signal.json` and dated `signal_history/YYYY-MM-DD.json`.
 4. Replay only saved artifacts against later prices.
@@ -52,7 +52,7 @@ The current lifecycle is accumulation-first:
   artifacts.
 - Sending runtime Telegram or broker-facing notifications directly from this
   research repository before a deterministic plugin contract exists.
-- Duplicating `CodexAuditBridge` provider fallback or cross-repository write
+- Duplicating `AIAuditBridge` provider fallback or cross-repository write
   logic inside this repository.
 
 ## Validation Strategy

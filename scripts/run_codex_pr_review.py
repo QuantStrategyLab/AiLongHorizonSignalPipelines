@@ -21,7 +21,7 @@ from string import Template
 from typing import Any
 
 # ---------------------------------------------------------------------------
-# Configuration (aligned with CodexAuditBridge)
+# Configuration (aligned with AIAuditBridge)
 # ---------------------------------------------------------------------------
 
 API_BASE = "https://api.github.com"

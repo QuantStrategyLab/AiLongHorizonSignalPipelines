@@ -19,7 +19,7 @@ on:
           - codex
           - openai
       source_ref:
-        description: "Ref to pass to CodexAuditBridge"
+        description: "Ref to pass to AIAuditBridge"
         required: false
         default: "main"
 
@@ -107,7 +107,7 @@ jobs:
           private-key: ${{ secrets.CROSS_REPO_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: |
-            CodexAuditBridge
+            AIAuditBridge
           permission-actions: write
 
       - name: Create shadow signal issue and dispatch bridge
