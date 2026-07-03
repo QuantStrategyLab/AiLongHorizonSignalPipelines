@@ -10,7 +10,7 @@ def test_build_issue_body_marks_notification_and_shadow_boundary() -> None:
         as_of_date="2026-05-29",
         source_ref="main",
         provider="auto",
-        bridge_repository="QuantStrategyLab/CodexAuditBridge",
+        bridge_repository="QuantStrategyLab/AIAuditBridge",
         context_bundle={"as_of": "2026-05-29", "price_context": {"QQQ": {"trend": "above_200d"}}},
     )
 
