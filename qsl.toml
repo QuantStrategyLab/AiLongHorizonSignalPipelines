@@ -6,4 +6,4 @@ allow_legacy = false
 snapshot_contract = "docs/architecture.md"
 
 [qsl.compat]
-bundle = "2026.07.0"
+bundle = "2026.07.1"
