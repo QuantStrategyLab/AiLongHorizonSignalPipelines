@@ -130,7 +130,7 @@ def build_issue_body(
             "## Operator Notification",
             "",
             "This issue is the operator-facing notification for the shadow signal run.",
-            "CodexAuditBridge should post its review result here and may open a focused PR",
+            "AIAuditBridge should post its review result here and may open a focused PR",
             "only for schema-valid shadow artifacts.",
             "",
             "## Boundaries",
