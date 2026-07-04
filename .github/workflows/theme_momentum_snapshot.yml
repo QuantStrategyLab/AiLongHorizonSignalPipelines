@@ -93,7 +93,20 @@ jobs:
             echo "No theme momentum changes to commit."
           else
             git commit -m "Update theme momentum snapshot [skip ci]"
-            git push
+            push_log="$(mktemp)"
+            if git push 2>"${push_log}"; then
+              rm -f "${push_log}"
+            else
+              if grep -Eq 'GH013|repository rule violations|required status check' "${push_log}"; then
+                echo "Push blocked by repository rules; keeping artifact-only output."
+                cat "${push_log}"
+                rm -f "${push_log}"
+              else
+                cat "${push_log}" >&2
+                rm -f "${push_log}"
+                exit 1
+              fi
+            fi
           fi
       - name: Upload theme momentum artifact
         uses: actions/upload-artifact@v7
