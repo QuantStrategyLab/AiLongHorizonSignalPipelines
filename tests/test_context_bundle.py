@@ -136,3 +136,35 @@ def test_build_context_from_source_can_skip_failed_downloads_when_partial_allowe
 
     assert sorted(bundle["price_context"]) == ["QQQ"]
     assert "missing price history for BAD" in bundle["data_quality"]["warnings"]
+
+
+def test_build_context_bundle_omits_web_research_by_default() -> None:
+    rows = [
+        PriceRow(date=dt.date(2026, 1, 1) + dt.timedelta(days=idx), symbol="QQQ", close=100 + idx)
+        for idx in range(260)
+    ]
+
+    bundle = build_context_bundle(rows, symbols=["QQQ"], generated_at=dt.datetime(2026, 1, 1, tzinfo=dt.timezone.utc))
+
+    assert "web_research" not in bundle
+
+
+def test_build_context_bundle_embeds_web_research_context() -> None:
+    rows = [
+        PriceRow(date=dt.date(2026, 1, 1) + dt.timedelta(days=idx), symbol="QQQ", close=100 + idx)
+        for idx in range(260)
+    ]
+
+    web_research_context = {
+        "pit_timestamp": "2026-01-01T00:00:00Z",
+        "research_sources": [{"title": "Example", "summary": "Summary", "url": "https://example.com"}],
+    }
+
+    bundle = build_context_bundle(
+        rows,
+        symbols=["QQQ"],
+        generated_at=dt.datetime(2026, 1, 1, tzinfo=dt.timezone.utc),
+        web_research_context=web_research_context,
+    )
+
+    assert bundle["web_research"] == web_research_context
