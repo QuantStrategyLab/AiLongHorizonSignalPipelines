@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 
 from scripts import post_shadow_signal_request as shadow_issue
 
@@ -25,6 +26,13 @@ def test_build_issue_body_marks_notification_and_shadow_boundary() -> None:
 def test_resolve_as_of_date_prefers_context_bundle() -> None:
     assert shadow_issue.resolve_as_of_date(None, {"as_of": "2026-05-29"}) == "2026-05-29"
     assert shadow_issue.resolve_as_of_date("2026-05-28", {"as_of": "2026-05-29"}) == "2026-05-28"
+
+
+def test_parse_args_defaults_provider_to_codex(monkeypatch) -> None:
+    monkeypatch.setattr(sys, "argv", ["post_shadow_signal_request.py", "--repo", "QuantStrategyLab/ResearchSignalContextPipelines"])
+    args = shadow_issue.parse_args()
+
+    assert args.provider == "codex"
 
 
 def test_upsert_issue_updates_existing_issue(monkeypatch) -> None:
