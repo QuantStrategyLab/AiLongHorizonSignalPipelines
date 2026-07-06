@@ -1,5 +1,14 @@
 # ResearchSignalContextPipelines
 
+
+## QSL architecture role
+
+- **Layer**: `research`.
+- **Responsibility**: medium/long-horizon research signal context pipeline.
+- **Owns**: theme context artifacts and AI shadow context outputs.
+- **Consumes**: public/research inputs and downstream advisory/pipeline consumers.
+- **Must not**: submit orders or mutate live runtime allocations.
+
 [Chinese README](README.zh-CN.md)
 
 > Investing involves risk. This project does not provide investment advice and is for education, research, and engineering review only.

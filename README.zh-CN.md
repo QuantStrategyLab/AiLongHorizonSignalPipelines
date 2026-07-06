@@ -1,5 +1,14 @@
 # ResearchSignalContextPipelines
 
+
+## QSL 架构角色
+
+- **层级**：`研究/证据`。
+- **职责**：中长期 research signal context 流水线。
+- **事实源/归属**：theme context artifacts 和 AI shadow context outputs。
+- **消费对象**：公开/研究输入和下游 advisory/pipeline consumers。
+- **禁止事项**：下单或修改 live runtime allocations。
+
 [English README](README.md)
 
 > 投资有风险。本项目不构成投资建议，仅用于学习、研究和工程审阅。
