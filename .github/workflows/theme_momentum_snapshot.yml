@@ -97,7 +97,7 @@ jobs:
             if git push 2>"${push_log}"; then
               rm -f "${push_log}"
             else
-              if grep -Eq 'GH013|repository rule violations|required status check' "${push_log}"; then
+              if grep -Fq 'GH013: Repository rule violations found for refs/heads/main' "${push_log}" && grep -Eqi 'required status check' "${push_log}"; then
                 echo "Push blocked by repository rules; keeping artifact-only output."
                 cat "${push_log}"
                 rm -f "${push_log}"
