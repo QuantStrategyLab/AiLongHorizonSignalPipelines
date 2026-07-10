@@ -1,7 +1,7 @@
 [qsl]
 repo = "ResearchSignalContextPipelines"
-tier = "research"
-ring = 2
+tier = "pipeline"
+upgrade_ring = "ring_c"
 allow_legacy = false
 snapshot_contract = "docs/architecture.md"
 
