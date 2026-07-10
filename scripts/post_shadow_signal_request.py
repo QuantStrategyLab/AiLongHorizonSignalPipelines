@@ -172,7 +172,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Create or update a long-horizon shadow signal issue.")
     parser.add_argument("--repo", required=True)
     parser.add_argument("--source-ref", default="main")
-    parser.add_argument("--provider", default="auto")
+    parser.add_argument("--provider", default="codex")
     parser.add_argument("--bridge-repository", default="QuantStrategyLab/AIAuditBridge")
     parser.add_argument("--as-of-date")
     parser.add_argument("--context-file", help="Optional JSON context bundle to embed in the issue body")

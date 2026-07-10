@@ -276,6 +276,7 @@ def build_context_bundle(
     symbols: list[str],
     generated_at: dt.datetime | None = None,
     theme_context: Mapping[str, Any] | None = None,
+    web_research_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     contexts: dict[str, SymbolContext] = {}
     warnings: list[str] = []
@@ -337,6 +338,8 @@ def build_context_bundle(
     }
     if theme_context is not None:
         bundle["theme_context"] = dict(theme_context)
+    if web_research_context is not None:
+        bundle["web_research"] = dict(web_research_context)
     return bundle
 
 
@@ -347,6 +350,7 @@ def build_error_context_bundle(
     as_of_date: dt.date | None = None,
     generated_at: dt.datetime | None = None,
     theme_context: Mapping[str, Any] | None = None,
+    web_research_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     as_of = as_of_date or dt.date.today()
     timestamp = generated_at or dt.datetime.now(dt.timezone.utc)
@@ -375,6 +379,8 @@ def build_error_context_bundle(
     }
     if theme_context is not None:
         bundle["theme_context"] = dict(theme_context)
+    if web_research_context is not None:
+        bundle["web_research"] = dict(web_research_context)
     return bundle
 
 
@@ -395,7 +401,9 @@ def build_context_from_source(
     lookback_days: int = 420,
     fetch_fn: Callable[..., Mapping[str, Any]] | None = None,
     theme_context: Mapping[str, Any] | None = None,
+    web_research_context: Mapping[str, Any] | None = None,
     allow_partial_downloads: bool = False,
+    generated_at: dt.datetime | None = None,
 ) -> dict[str, Any]:
     end = parse_price_date(end_date) if end_date else dt.date.today()
     start = parse_price_date(start_date) if start_date else end - dt.timedelta(days=int(lookback_days))
@@ -409,7 +417,13 @@ def build_context_from_source(
             fetch_fn=fetch_fn,
             allow_partial=allow_partial_downloads,
         )
-    return build_context_bundle(rows, symbols=symbols, theme_context=theme_context)
+    return build_context_bundle(
+        rows,
+        symbols=symbols,
+        generated_at=generated_at,
+        theme_context=theme_context,
+        web_research_context=web_research_context,
+    )
 
 
 def write_context_bundle(bundle: Mapping[str, Any], path: Path) -> None:

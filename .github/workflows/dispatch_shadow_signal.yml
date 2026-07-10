@@ -11,7 +11,7 @@ on:
         description: "Bridge provider"
         required: false
         type: choice
-        default: "auto"
+        default: "codex"
         options:
           - auto
           - api
@@ -39,7 +39,7 @@ jobs:
       BRIDGE_REPOSITORY: ${{ vars.CODEX_AUDIT_BRIDGE_REPOSITORY || 'QuantStrategyLab/AIAuditBridge' }}
       BRIDGE_REF: ${{ vars.CODEX_AUDIT_BRIDGE_REF || 'main' }}
       BRIDGE_TASK: long_horizon_signal_shadow
-      BRIDGE_PROVIDER: ${{ github.event.inputs.provider || 'auto' }}
+      BRIDGE_PROVIDER: ${{ github.event.inputs.provider || 'codex' }}
       SOURCE_REF: ${{ github.event.inputs.source_ref || 'main' }}
       SHADOW_SIGNAL_LABEL: long-horizon-shadow
     steps:

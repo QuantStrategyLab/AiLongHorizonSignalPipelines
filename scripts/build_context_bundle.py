@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import sys
 from pathlib import Path
@@ -18,6 +19,7 @@ from research_signal_context_pipelines.context_bundle import (  # noqa: E402
     normalize_symbols,
     write_context_bundle,
 )
+from research_signal_context_pipelines.research_context_adapter import ResearchContextAdapter  # noqa: E402
 from research_signal_context_pipelines.theme_universe import (  # noqa: E402
     build_theme_context,
     load_symbol_theme_exposure,
@@ -50,9 +52,13 @@ def main() -> int:
         default="data/output/context_bundle/latest_context_bundle.json",
         help="Output JSON context bundle path",
     )
+    parser.add_argument("--web-research-sources", help="Optional JSON config with whitelist and web research sources")
+    parser.add_argument("--web-research-timeout", type=float, default=10.0, help="Timeout in seconds for web research fetches")
+    parser.add_argument("--web-research-max-entries", type=int, default=8, help="Maximum web research entries to include")
     args = parser.parse_args()
 
     symbols = normalize_symbols(args.symbols)
+    generated_at = dt.datetime.now(dt.timezone.utc)
     theme_context = None
     if not args.no_theme_context:
         theme_taxonomy_path = Path(args.theme_taxonomy)
@@ -62,6 +68,14 @@ def main() -> int:
             exposures = load_symbol_theme_exposure(theme_exposure_path, known_theme_ids=themes)
             theme_context = build_theme_context(symbols=symbols, themes=themes, exposures=exposures)
 
+    web_research_context = None
+    if args.web_research_sources:
+        web_research_context = ResearchContextAdapter(
+            Path(args.web_research_sources),
+            timeout_seconds=args.web_research_timeout,
+            max_entries=args.web_research_max_entries,
+        ).build_context(pit_timestamp=generated_at)
+
     try:
         bundle = build_context_from_source(
             symbols=symbols,
@@ -70,7 +84,9 @@ def main() -> int:
             end_date=args.end_date,
             lookback_days=args.lookback_days,
             theme_context=theme_context,
+            web_research_context=web_research_context,
             allow_partial_downloads=not args.strict_downloads,
+            generated_at=generated_at,
         )
     except Exception as exc:
         if not args.allow_download_errors:
@@ -79,6 +95,8 @@ def main() -> int:
             symbols=symbols,
             error=f"{type(exc).__name__}: {exc}",
             theme_context=theme_context,
+            web_research_context=web_research_context,
+            generated_at=generated_at,
         )
     output_path = Path(args.output)
     write_context_bundle(bundle, output_path)
