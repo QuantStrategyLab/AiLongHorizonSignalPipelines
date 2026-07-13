@@ -1,0 +1,35 @@
+{
+  "schema_version": "2",
+  "as_of": "2026-05-28",
+  "generated_at": "2026-05-28T00:00:00Z",
+  "expires_at": "2026-08-20",
+  "model_version": "theme-momentum-example-v1",
+  "scoring_version": "theme-momentum-example-rules-v1",
+  "mode": "theme_momentum_snapshot",
+  "artifact_type": "medium_horizon_theme_context",
+  "horizon": "medium",
+  "theme_ranks": [],
+  "data_quality": {
+    "warnings": [],
+    "gate": {
+      "status": "pass",
+      "allow_downstream_recommendation": true,
+      "reasons": []
+    },
+    "coverage": {
+      "configured_symbol_count": 1,
+      "priced_symbol_count": 1,
+      "price_coverage_ratio": 1.0,
+      "insufficient_history_symbol_count": 0
+    },
+    "missing_price_symbols": [],
+    "insufficient_history_symbols": [],
+    "unranked_themes": []
+  },
+  "policy": {
+    "execution_allowed": false,
+    "portfolio_allocation_allowed": false,
+    "theme_rank_is_research_context_only": true,
+    "downstream_use": "Example validation only."
+  }
+}

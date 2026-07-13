@@ -8,10 +8,37 @@
       "price_coverage_ratio": 1.0,
       "priced_symbol_count": 53
     },
+    "gate": {
+      "allow_downstream_recommendation": false,
+      "reasons": [
+        "stale price data: latest as_of 2026-06-26 is older than 5 days",
+        "extreme return_3m for MU: 2.1869 exceeds +/-1.00; secondary validation required",
+        "extreme return_6_1m for MU: 3.4808 exceeds +/-2.00; secondary validation required",
+        "extreme return_12_1m for MU: 8.9671 exceeds +/-4.00; secondary validation required",
+        "extreme return_3m for INTC: 1.9098 exceeds +/-1.00; secondary validation required",
+        "extreme return_6_1m for INTC: 2.5296 exceeds +/-2.00; secondary validation required",
+        "extreme return_12_1m for INTC: 5.0733 exceeds +/-4.00; secondary validation required",
+        "extreme return_3m for AMD: 1.5597 exceeds +/-1.00; secondary validation required",
+        "extreme return_3m for DELL: 1.2792 exceeds +/-1.00; secondary validation required"
+      ],
+      "status": "blocked"
+    },
     "insufficient_history_symbols": [],
     "missing_price_symbols": [],
-    "unranked_themes": []
+    "unranked_themes": [],
+    "warnings": [
+      "stale price data: latest as_of 2026-06-26 is older than 5 days",
+      "extreme return_3m for MU: 2.1869 exceeds +/-1.00; secondary validation required",
+      "extreme return_6_1m for MU: 3.4808 exceeds +/-2.00; secondary validation required",
+      "extreme return_12_1m for MU: 8.9671 exceeds +/-4.00; secondary validation required",
+      "extreme return_3m for INTC: 1.9098 exceeds +/-1.00; secondary validation required",
+      "extreme return_6_1m for INTC: 2.5296 exceeds +/-2.00; secondary validation required",
+      "extreme return_12_1m for INTC: 5.0733 exceeds +/-4.00; secondary validation required",
+      "extreme return_3m for AMD: 1.5597 exceeds +/-1.00; secondary validation required",
+      "extreme return_3m for DELL: 1.2792 exceeds +/-1.00; secondary validation required"
+    ]
   },
+  "expires_at": "2026-09-18",
   "generated_at": "2026-06-27T12:57:19.193780Z",
   "horizon": "medium",
   "horizon_window": "2-12 weeks",
@@ -40,13 +67,15 @@
     }
   },
   "mode": "theme_momentum_snapshot",
+  "model_version": "theme-momentum-v1",
   "policy": {
     "downstream_use": "Medium-horizon theme context for research ranking and replay only; do not route to broker execution.",
     "execution_allowed": false,
     "portfolio_allocation_allowed": false,
     "theme_rank_is_research_context_only": true
   },
-  "schema_version": "1",
+  "schema_version": "2",
+  "scoring_version": "theme-momentum-rules-v1",
   "source_artifacts": {
     "prices": "yahoo_chart_download",
     "theme_exposures": "config/symbol_theme_exposure.csv",

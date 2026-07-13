@@ -70,6 +70,7 @@ jobs:
             ARGS+=(--strict-downloads)
           fi
           python scripts/build_theme_momentum_snapshot.py "${ARGS[@]}" | tee /tmp/theme_momentum_summary.json
+          python scripts/validate_theme_momentum_snapshot.py data/output/theme_momentum_snapshot.json
           {
             echo "## Theme momentum snapshot"
             echo ""

@@ -22,7 +22,7 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
       - name: Validate example signal
-        run: python scripts/validate_latest_signal.py examples/latest_signal.example.json
+        run: python scripts/validate_latest_signal.py examples/latest_signal.example.json --allow-expired
       - name: Run example overlay replay
         run: python scripts/backtest_signal_overlay.py --prices examples/price_history.example.csv --signals examples/signal_history --symbol QQQ
       - name: Run example price extraction

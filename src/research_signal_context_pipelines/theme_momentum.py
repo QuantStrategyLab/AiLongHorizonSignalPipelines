@@ -25,6 +25,17 @@ THEME_MOMENTUM_ARTIFACT_TYPE = "medium_horizon_theme_context"
 THEME_MOMENTUM_HORIZON = "medium"
 THEME_MOMENTUM_HORIZON_WINDOW = "2-12 weeks"
 THEME_MOMENTUM_HORIZON_WINDOW_ZH = "2-12周"
+THEME_MOMENTUM_MODEL_VERSION = "theme-momentum-v1"
+THEME_MOMENTUM_SCORING_VERSION = "theme-momentum-rules-v1"
+THEME_MOMENTUM_EXPIRY_DAYS = 84
+MAX_PRICE_AGE_DAYS = 5
+EXTREME_RETURN_THRESHOLDS = {
+    "return_3m": 1.0,
+    "return_6_1m": 2.0,
+    "return_12_1m": 4.0,
+}
+SPLIT_SUSPECT_DAILY_RETURN = 0.50
+MIN_PRICE_COVERAGE_RATIO = 0.80
 
 
 def utc_now_iso() -> str:
@@ -143,7 +154,32 @@ def build_theme_momentum_snapshot(
         symbol for symbol in priced_exposure_symbols if symbol_scores[symbol]["momentum_score"] is None
     )
     latest_dates = [parse_price_date(item["as_of"]) for item in symbol_scores.values()]
+    actual_latest_date = max(latest_dates) if latest_dates else None
     snapshot_as_of = (as_of_date or max(latest_dates)).isoformat() if latest_dates or as_of_date else dt.date.today().isoformat()
+    timestamp = generated_at or dt.datetime.now(dt.UTC)
+    quality_warnings: list[str] = []
+
+    freshness_boundary = as_of_date or actual_latest_date
+    if freshness_boundary and actual_latest_date and freshness_boundary - actual_latest_date > dt.timedelta(days=MAX_PRICE_AGE_DAYS):
+        quality_warnings.append(
+            f"stale price data: latest priced row {actual_latest_date.isoformat()} is older than {MAX_PRICE_AGE_DAYS} days before as_of {freshness_boundary.isoformat()}"
+        )
+    for symbol, symbol_data in symbol_scores.items():
+        metrics = symbol_data["metrics"]
+        for metric, threshold in EXTREME_RETURN_THRESHOLDS.items():
+            value = metrics.get(metric)
+            if value is not None and abs(value) > threshold:
+                quality_warnings.append(
+                    f"extreme {metric} for {symbol}: {value:.4f} exceeds +/-{threshold:.2f}; secondary validation required"
+                )
+        ordered_rows = sorted(rows_by_symbol[symbol], key=lambda item: item.date)
+        continuity_window = ordered_rows[-(max(spec["lookback"] + spec["skip"] for spec in MOMENTUM_WINDOWS.values()) + 1) :]
+        for previous, current in zip(continuity_window, continuity_window[1:]):
+            if previous.close > 0 and abs(current.close / previous.close - 1.0) > SPLIT_SUSPECT_DAILY_RETURN:
+                quality_warnings.append(
+                    f"possible split/adjustment for {symbol} on {current.date.isoformat()}; adjusted-price continuity requires review"
+                )
+                break
 
     theme_members: dict[str, list[str]] = defaultdict(list)
     for symbol, exposure in exposures.items():
@@ -217,10 +253,27 @@ def build_theme_momentum_snapshot(
         item["rank"] = idx
 
     taxonomy_versions = sorted({theme.taxonomy_version for theme in themes.values() if theme.taxonomy_version})
+    coverage_ratio = len(priced_exposure_symbols) / len(exposure_symbols) if exposure_symbols else 0.0
+    if missing_price_symbols:
+        quality_warnings.append(f"missing price symbols: {', '.join(sorted(missing_price_symbols))}")
+    if insufficient_history_symbols:
+        quality_warnings.append(
+            f"insufficient history symbols: {', '.join(insufficient_history_symbols)}"
+        )
+    if unranked_themes:
+        quality_warnings.append(f"unranked themes: {', '.join(sorted(unranked_themes))}")
+    if coverage_ratio < MIN_PRICE_COVERAGE_RATIO:
+        quality_warnings.append(
+            f"price coverage ratio {coverage_ratio:.4f} is below minimum {MIN_PRICE_COVERAGE_RATIO:.2f}"
+        )
+    quality_warnings = list(dict.fromkeys(quality_warnings))
     return {
-        "schema_version": "1",
+        "schema_version": "2",
         "as_of": snapshot_as_of,
-        "generated_at": (generated_at or dt.datetime.now(dt.UTC)).isoformat().replace("+00:00", "Z"),
+        "generated_at": timestamp.isoformat().replace("+00:00", "Z"),
+        "expires_at": (parse_price_date(snapshot_as_of) + dt.timedelta(days=THEME_MOMENTUM_EXPIRY_DAYS)).isoformat(),
+        "model_version": THEME_MOMENTUM_MODEL_VERSION,
+        "scoring_version": THEME_MOMENTUM_SCORING_VERSION,
         "mode": "theme_momentum_snapshot",
         "artifact_type": THEME_MOMENTUM_ARTIFACT_TYPE,
         "horizon": THEME_MOMENTUM_HORIZON,
@@ -244,11 +297,17 @@ def build_theme_momentum_snapshot(
         },
         "theme_ranks": theme_ranks,
         "data_quality": {
+            "warnings": quality_warnings,
+            "gate": {
+                "status": "blocked" if quality_warnings else "pass",
+                "allow_downstream_recommendation": not quality_warnings,
+                "reasons": quality_warnings,
+            },
             "coverage": {
                 "configured_symbol_count": len(exposure_symbols),
                 "priced_symbol_count": len(priced_exposure_symbols),
                 "price_coverage_ratio": round_optional(
-                    len(priced_exposure_symbols) / len(exposure_symbols) if exposure_symbols else None
+                    coverage_ratio if exposure_symbols else None
                 ),
                 "insufficient_history_symbol_count": len(insufficient_history_symbols),
             },
@@ -263,6 +322,65 @@ def build_theme_momentum_snapshot(
             "downstream_use": "Medium-horizon theme context for research ranking and replay only; do not route to broker execution.",
         },
     }
+
+
+def validate_theme_momentum_snapshot(
+    snapshot: Mapping[str, Any], *, reference_date: dt.date | None = None, compatibility: bool = False
+) -> None:
+    required = ("schema_version", "as_of", "generated_at")
+    missing = [key for key in required if not snapshot.get(key)]
+    if missing:
+        raise ValueError(f"theme momentum snapshot missing required keys: {', '.join(missing)}")
+    schema_version = str(snapshot["schema_version"])
+    if schema_version not in {"1", "2"}:
+        raise ValueError("theme momentum snapshot schema_version must be '1' or '2'")
+    as_of = parse_price_date(snapshot["as_of"])
+    if schema_version == "1":
+        if not compatibility:
+            raise ValueError("schema 1 theme momentum snapshots require explicit compatibility=True")
+        legacy_required = ("mode", "artifact_type", "horizon", "theme_ranks", "data_quality", "policy")
+        missing_legacy = [key for key in legacy_required if key not in snapshot]
+        if missing_legacy:
+            raise ValueError(f"legacy theme momentum snapshot missing required keys: {', '.join(missing_legacy)}")
+        generated_at = snapshot["generated_at"]
+        if not isinstance(generated_at, str) or not generated_at.strip():
+            raise ValueError("legacy theme momentum snapshot generated_at must be a non-empty ISO datetime")
+        try:
+            dt.datetime.fromisoformat(generated_at[:-1] + "+00:00" if generated_at.endswith("Z") else generated_at)
+        except ValueError as exc:
+            raise ValueError("legacy theme momentum snapshot generated_at must be an ISO datetime") from exc
+        if not isinstance(snapshot["theme_ranks"], list) or not isinstance(snapshot["data_quality"], Mapping):
+            raise ValueError("legacy theme momentum snapshot core shape is invalid")
+        return
+    for key in ("expires_at", "model_version", "scoring_version"):
+        if not snapshot.get(key):
+            raise ValueError(f"theme momentum snapshot missing required keys: {key}")
+    expires_at = parse_price_date(snapshot["expires_at"])
+    generated_at = snapshot["generated_at"]
+    if not isinstance(generated_at, str) or not generated_at.strip():
+        raise ValueError("theme momentum snapshot generated_at must be a non-empty ISO datetime")
+    try:
+        dt.datetime.fromisoformat(generated_at[:-1] + "+00:00" if generated_at.endswith("Z") else generated_at)
+    except ValueError as exc:
+        raise ValueError("theme momentum snapshot generated_at must be an ISO datetime") from exc
+    for key in ("model_version", "scoring_version"):
+        if not isinstance(snapshot[key], str) or not snapshot[key].strip():
+            raise ValueError(f"theme momentum snapshot {key} must be a non-empty string")
+    if expires_at < as_of:
+        raise ValueError("theme momentum snapshot expires_at must not be before as_of")
+    if reference_date and expires_at < reference_date:
+        raise ValueError(f"theme momentum snapshot expired on {expires_at.isoformat()}")
+    data_quality = snapshot.get("data_quality")
+    if not isinstance(data_quality, Mapping) or not isinstance(data_quality.get("warnings"), list):
+        raise ValueError("theme momentum snapshot data_quality.warnings must be a list")
+    gate = data_quality.get("gate")
+    if not isinstance(gate, Mapping) or gate.get("status") not in {"pass", "blocked"}:
+        raise ValueError("theme momentum snapshot data_quality.gate.status is invalid")
+    if not isinstance(gate.get("allow_downstream_recommendation"), bool):
+        raise ValueError("theme momentum snapshot data_quality.gate.allow_downstream_recommendation must be boolean")
+    warnings = data_quality["warnings"]
+    if gate["allow_downstream_recommendation"] != (not warnings) or gate["status"] != ("pass" if not warnings else "blocked"):
+        raise ValueError("theme momentum snapshot data_quality.gate is inconsistent with warnings")
 
 
 def write_theme_momentum_snapshot(snapshot: Mapping[str, Any], path: str | Path) -> Path:

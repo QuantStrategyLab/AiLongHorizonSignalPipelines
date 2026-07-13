@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 
@@ -77,16 +79,28 @@ def _require_number_0_1(value: Any, name: str) -> None:
         raise SignalValidationError(f"{name} must be between 0 and 1")
 
 
-def validate_signal(payload: Mapping[str, Any]) -> None:
+def validate_signal(
+    payload: Mapping[str, Any], *, reference_date: dt.date | None = None, check_freshness: bool = False
+) -> None:
     missing = [key for key in REQUIRED_TOP_LEVEL_KEYS if key not in payload]
     if missing:
         raise SignalValidationError(f"missing required keys: {', '.join(missing)}")
 
-    if _require_string(payload["schema_version"], "schema_version") != "1":
-        raise SignalValidationError("schema_version must be '1'")
+    schema_version = _require_string(payload["schema_version"], "schema_version")
+    if schema_version not in {"1", "2"}:
+        raise SignalValidationError("schema_version must be '1' or '2'")
     _require_iso_date(payload["as_of"], "as_of")
     _require_iso_datetime(payload["generated_at"], "generated_at")
     _require_iso_date(payload["expires_at"], "expires_at")
+    if schema_version == "2":
+        for key in ("model_version", "scoring_version"):
+            _require_string(payload.get(key), key)
+    if dt.date.fromisoformat(payload["expires_at"]) < dt.date.fromisoformat(payload["as_of"]):
+        raise SignalValidationError("expires_at must not be before as_of")
+    if check_freshness and dt.date.fromisoformat(payload["expires_at"]) < (
+        reference_date or dt.datetime.now(dt.UTC).date()
+    ):
+        raise SignalValidationError(f"signal artifact expired on {payload['expires_at']}")
 
     if payload["mode"] != "shadow":
         raise SignalValidationError("mode must be 'shadow'")
@@ -123,6 +137,39 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     if policy.get("execution_allowed") is not False:
         raise SignalValidationError("policy.execution_allowed must be false")
     _require_string(policy.get("downstream_use"), "policy.downstream_use")
+
+
+def validate_latest_signal(
+    payload: Mapping[str, Any],
+    *,
+    reference_date: dt.date | None = None,
+    theme_artifact_path: str | Path | None = None,
+    check_freshness: bool = True,
+) -> None:
+    """Validate a signal for current/latest consumption, including freshness."""
+    validate_signal(payload, reference_date=reference_date, check_freshness=check_freshness)
+    source_paths = list(payload.get("evidence", {}).get("sources", []))
+    artifact = Path(theme_artifact_path) if theme_artifact_path else next(
+        (Path(source) for source in source_paths if "theme_momentum_snapshot" in str(source)),
+        None,
+    )
+    if artifact is None:
+        raise SignalValidationError("latest signal requires a referenced theme momentum artifact")
+    if not artifact.exists():
+        raise SignalValidationError(f"referenced theme momentum artifact not found: {artifact}")
+    theme_payload = json.loads(artifact.read_text(encoding="utf-8"))
+    from .theme_momentum import validate_theme_momentum_snapshot
+
+    try:
+        validate_theme_momentum_snapshot(
+            theme_payload,
+            reference_date=reference_date if check_freshness else None,
+        )
+    except ValueError as exc:
+        raise SignalValidationError(f"invalid referenced theme momentum artifact: {exc}") from exc
+    gate = theme_payload.get("data_quality", {}).get("gate", {})
+    if gate.get("allow_downstream_recommendation") is not True:
+        raise SignalValidationError("referenced theme momentum artifact is blocked by data_quality.gate")
 
 
 def _validate_bias_mapping(mapping: Mapping[str, Any], name: str) -> None:

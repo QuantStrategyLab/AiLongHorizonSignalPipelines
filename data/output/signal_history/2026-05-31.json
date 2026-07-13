@@ -31,7 +31,9 @@
     "requires_fundamental_and_valuation_review",
     "no_account_level_advice"
   ],
-  "schema_version": "1",
+  "schema_version": "2",
+  "model_version": "shadow-signal-example-v1",
+  "scoring_version": "shadow-signal-example-rules-v1",
   "symbol_bias": {
     "AMD": {
       "bias": "watch",

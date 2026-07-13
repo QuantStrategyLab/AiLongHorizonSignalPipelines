@@ -1,9 +1,9 @@
 {
   "artifact": "data/output/latest_signal.json",
-  "artifact_sha256": "39368aa3eae5da168665fde58edbe17bbef1c70fa4070b58051c928aaefc0b1a",
-  "as_of": "2026-05-31",
-  "generated_at": "2026-05-31T10:52:51Z",
-  "history_artifact": "data/output/signal_history/2026-05-31.json",
+  "artifact_sha256": "5fb8891cb793663636b65a70c4bb96c889533ded2a94cef2f7ae6e0c6fa482eb",
+  "as_of": "2026-06-25",
+  "generated_at": "2026-06-27T08:22:28.245044Z",
+  "history_artifact": "data/output/signal_history/2026-06-25.json",
   "mode": "shadow",
   "policy": {
     "downstream_use": "Manifest only records provenance for a shadow research artifact; it does not authorize execution.",

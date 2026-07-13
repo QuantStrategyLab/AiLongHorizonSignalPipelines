@@ -1,5 +1,7 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
+  "model_version": "shadow-signal-example-v1",
+  "scoring_version": "shadow-signal-example-rules-v1",
   "as_of": "2026-01-02",
   "generated_at": "2026-01-02T22:00:00Z",
   "mode": "shadow",

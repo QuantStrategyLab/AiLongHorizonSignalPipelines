@@ -1,5 +1,7 @@
 {
-  "schema_version": "1",
+  "schema_version": "2",
+  "model_version": "shadow-signal-example-v1",
+  "scoring_version": "shadow-signal-example-rules-v1",
   "as_of": "2026-05-28",
   "generated_at": "2026-05-28T00:00:00Z",
   "mode": "shadow",
@@ -44,7 +46,8 @@
   "confidence": 0.25,
   "evidence": {
     "sources": [
-      "examples/context_bundle.example.json"
+    "examples/context_bundle.example.json"
+    ,"examples/theme_momentum_snapshot.example.json"
     ],
     "summary": "Synthetic example artifact for schema validation only, including optional cross-sector theme fields.",
     "data_gaps": [
@@ -52,7 +55,7 @@
       "No replay evidence is attached."
     ]
   },
-  "expires_at": "2026-06-28",
+  "expires_at": "2026-12-31",
   "policy": {
     "execution_allowed": false,
     "downstream_use": "Shadow context only; deterministic policy must explicitly opt in before any future use."

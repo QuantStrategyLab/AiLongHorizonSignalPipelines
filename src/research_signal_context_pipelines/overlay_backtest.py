@@ -51,7 +51,7 @@ def load_signals(path: Path) -> list[dict[str, Any]]:
     signals: list[dict[str, Any]] = []
     for signal_path in signal_paths:
         payload = json.loads(signal_path.read_text(encoding="utf-8"))
-        validate_signal(payload)
+        validate_signal(payload, check_freshness=False)
         signals.append(payload)
     signals.sort(key=lambda item: parse_date(str(item["as_of"])))
     return signals

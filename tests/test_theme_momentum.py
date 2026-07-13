@@ -3,7 +3,10 @@ from __future__ import annotations
 import datetime as dt
 
 from research_signal_context_pipelines.price_history import PriceRow
-from research_signal_context_pipelines.theme_momentum import build_theme_momentum_snapshot
+from research_signal_context_pipelines.theme_momentum import (
+    build_theme_momentum_snapshot,
+    validate_theme_momentum_snapshot,
+)
 from research_signal_context_pipelines.theme_universe import SymbolThemeExposure, ThemeDefinition
 
 
@@ -96,3 +99,88 @@ def test_theme_momentum_records_missing_price_coverage() -> None:
     assert snapshot["data_quality"]["coverage"]["price_coverage_ratio"] == 0.5
     assert snapshot["theme_ranks"][0]["component_count"] == 2
     assert snapshot["theme_ranks"][0]["priced_symbol_count"] == 1
+    assert snapshot["data_quality"]["gate"]["allow_downstream_recommendation"] is False
+    assert any("missing price symbols" in warning for warning in snapshot["data_quality"]["warnings"])
+
+
+def test_theme_momentum_emits_freshness_versions_and_data_quality_gate() -> None:
+    themes = {
+        "ai_compute": ThemeDefinition("test-v1", "ai_compute", "AI", "technology", "6-24 months", "AI", "primary")
+    }
+    exposures = {"MU": SymbolThemeExposure("MU", ("ai_compute",), "high", "memory")}
+    rows = _trend_rows("MU", start_close=10, daily_step=0.5, days=280)
+
+    snapshot = build_theme_momentum_snapshot(
+        rows,
+        themes=themes,
+        exposures=exposures,
+        generated_at=dt.datetime(2026, 1, 1, tzinfo=dt.timezone.utc),
+    )
+
+    assert snapshot["schema_version"]
+    assert snapshot["model_version"]
+    assert snapshot["scoring_version"]
+    assert snapshot["expires_at"] == "2025-12-30"
+    assert snapshot["data_quality"]["gate"]["allow_downstream_recommendation"] is False
+    assert any("extreme" in warning for warning in snapshot["data_quality"]["warnings"])
+
+
+def test_historical_as_of_uses_point_in_time_price_coverage_not_wall_clock() -> None:
+    themes = {
+        "ai_compute": ThemeDefinition("test-v1", "ai_compute", "AI", "technology", "6-24 months", "AI", "primary")
+    }
+    exposures = {"MU": SymbolThemeExposure("MU", ("ai_compute",), "high", "memory")}
+    rows = _trend_rows("MU", start_close=100, daily_step=0.1, days=280)
+    as_of = rows[-1].date
+
+    snapshot = build_theme_momentum_snapshot(
+        rows,
+        themes=themes,
+        exposures=exposures,
+        as_of=as_of,
+        generated_at=dt.datetime(2026, 7, 13, tzinfo=dt.timezone.utc),
+    )
+
+    assert not any("stale" in warning for warning in snapshot["data_quality"]["warnings"])
+
+
+def test_as_of_after_latest_price_uses_lag_gate_instead_of_raising() -> None:
+    themes = {
+        "ai_compute": ThemeDefinition("test-v1", "ai_compute", "AI", "technology", "6-24 months", "AI", "primary")
+    }
+    exposures = {"MU": SymbolThemeExposure("MU", ("ai_compute",), "high", "memory")}
+    rows = _trend_rows("MU", start_close=100, daily_step=0.1, days=280)
+    requested_as_of = rows[-1].date + dt.timedelta(days=2)
+
+    snapshot = build_theme_momentum_snapshot(
+        rows,
+        themes=themes,
+        exposures=exposures,
+        as_of=requested_as_of,
+    )
+
+    assert snapshot["as_of"] == requested_as_of.isoformat()
+    assert not any("stale" in warning for warning in snapshot["data_quality"]["warnings"])
+
+
+def test_theme_schema_one_requires_explicit_compatibility() -> None:
+    snapshot = {
+        "schema_version": "1",
+        "as_of": "2026-01-01",
+        "generated_at": "2026-01-02T00:00:00Z",
+        "mode": "theme_momentum_snapshot",
+        "artifact_type": "medium_horizon_theme_context",
+        "horizon": "medium",
+        "theme_ranks": [],
+        "data_quality": {},
+        "policy": {},
+    }
+
+    try:
+        validate_theme_momentum_snapshot(snapshot)
+    except ValueError as exc:
+        assert "compatibility" in str(exc)
+    else:
+        raise AssertionError("schema 1 must be rejected without compatibility")
+
+    validate_theme_momentum_snapshot(snapshot, compatibility=True)

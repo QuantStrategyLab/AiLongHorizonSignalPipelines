@@ -146,6 +146,20 @@ strong members inside a theme, but it does not encode short-term recommendations
 orders, target weights, or execution policy.  Future replay must consume saved
 snapshots rather than recomputing old theme ranks with revised constituents or revised weights.
 
+Every signal and theme snapshot records `as_of`, `generated_at`, `expires_at`,
+`schema_version`, `model_version`, and `scoring_version`. Consumers must reject
+expired artifacts. Theme snapshots also expose
+`data_quality.gate.allow_downstream_recommendation`; stale prices, extreme
+returns, or split/adjustment continuity concerns set this gate to `false` and
+must remain a warning rather than being silently treated as healthy data.
+Missing prices, insufficient history, unranked themes, or price coverage below
+the minimum `0.80` ratio also block this gate. `validate_latest_signal()`
+revalidates the linked theme artifact and gate; CLI `--allow-expired` only
+suppresses expiry/freshness failures and never bypasses linked-artifact or
+coverage checks. Historical `--as-of` builds compare the requested cutoff with
+the latest priced row and report provider/weekend lag through the gate instead
+of failing solely because rebuild time is later.
+
 ## Repository Name Decision
 
 `ResearchSignalContextPipelines` is the canonical name. The short/medium/long
