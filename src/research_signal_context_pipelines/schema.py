@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import re
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -161,6 +162,7 @@ def validate_latest_signal(
     payload: Mapping[str, Any],
     *,
     theme_artifact_path: str | Path | None = None,
+    signal_base_dir: str | Path | None = None,
 ) -> None:
     """Validate a v2 signal against its declared theme artifact linkage."""
     validate_signal(payload)
@@ -173,8 +175,18 @@ def validate_latest_signal(
     if len(theme_sources) != 1:
         raise SignalValidationError("latest signal must declare exactly one theme source")
     declared_source = theme_sources[0]
-    declared_path = Path(declared_source).resolve()
-    artifact_path = Path(theme_artifact_path).resolve() if theme_artifact_path else declared_path
+    base_dir = Path(signal_base_dir).resolve() if signal_base_dir else None
+
+    def resolve_source(value: str | Path) -> Path:
+        path = Path(value)
+        if path.is_absolute():
+            return path.resolve()
+        if base_dir is None:
+            raise SignalValidationError("relative theme source requires signal_base_dir")
+        return (base_dir / path).resolve()
+
+    declared_path = resolve_source(declared_source)
+    artifact_path = resolve_source(theme_artifact_path) if theme_artifact_path else declared_path
     if artifact_path != declared_path:
         raise SignalValidationError("theme artifact override must match the declared theme source")
     if not artifact_path.exists():
@@ -185,11 +197,21 @@ def validate_latest_signal(
         source_hashes = {}
     if not isinstance(source_hashes, Mapping):
         raise SignalValidationError("evidence.source_hashes must be an object")
-    expected_hash = source_hashes.get(declared_source) or source_hashes.get(str(declared_path))
-    if expected_hash is not None:
-        _require_string(expected_hash, "evidence.source_hashes value")
-        digest = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
-        if digest != expected_hash:
+    if declared_source in source_hashes:
+        expected_hash = source_hashes[declared_source]
+    elif str(declared_path) in source_hashes:
+        expected_hash = source_hashes[str(declared_path)]
+    else:
+        expected_hash = None
+    if expected_hash is not None or declared_source in source_hashes or str(declared_path) in source_hashes:
+        expected_hash = _require_string(expected_hash, "evidence.source_hashes value")
+        if not re.fullmatch(r"[0-9a-fA-F]{64}", expected_hash):
+            raise SignalValidationError("evidence.source_hashes value must be a SHA-256 hex digest")
+        try:
+            digest = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise SignalValidationError(f"declared theme artifact unreadable: {artifact_path}") from exc
+        if digest != expected_hash.lower():
             raise SignalValidationError("declared theme artifact sha256 does not match")
 
     try:

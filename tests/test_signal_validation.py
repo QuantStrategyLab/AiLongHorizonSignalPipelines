@@ -104,6 +104,32 @@ def test_strict_latest_rejects_linked_theme_as_of_mismatch(tmp_path) -> None:
         validate_latest_signal(payload, theme_artifact_path=theme_path)
 
 
+def test_strict_latest_rejects_present_but_invalid_source_hash(tmp_path) -> None:
+    theme_path = tmp_path / "theme_momentum_snapshot.json"
+    theme_path.write_text(json.dumps(_theme_snapshot()), encoding="utf-8")
+    payload = _strict_signal(source=str(theme_path))
+    payload["evidence"]["source_hashes"] = {str(theme_path): ""}
+
+    with pytest.raises(SignalValidationError, match="source_hashes"):
+        validate_latest_signal(payload, theme_artifact_path=theme_path)
+
+
+def test_strict_latest_resolves_relative_source_from_signal_base_dir(tmp_path) -> None:
+    theme_path = tmp_path / "theme_momentum_snapshot.json"
+    theme_path.write_text(json.dumps(_theme_snapshot()), encoding="utf-8")
+    relative_source = "theme_momentum_snapshot.json"
+    payload = _strict_signal(
+        source=relative_source,
+        source_sha256=hashlib.sha256(theme_path.read_bytes()).hexdigest(),
+    )
+
+    validate_latest_signal(
+        payload,
+        theme_artifact_path=relative_source,
+        signal_base_dir=tmp_path,
+    )
+
+
 def test_signal_requires_long_horizon_contract() -> None:
     payload = load_example()
     payload["horizon"] = "1-3 months"
