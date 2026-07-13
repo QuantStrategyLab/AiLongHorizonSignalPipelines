@@ -26,6 +26,20 @@ def test_reads_absolute_source_through_symlinked_base(tmp_path: Path) -> None:
     assert read_bounded_artifact_bytes(deployed / source.name, base_dir=deployed) == b"payload"
 
 
+def test_reads_absolute_source_through_lexically_normalized_symlinked_base(tmp_path: Path) -> None:
+    deploys = tmp_path / "deploys"
+    release = tmp_path / "releases" / "current"
+    deploys.mkdir()
+    release.mkdir(parents=True)
+    source = release / "artifact.json"
+    source.write_bytes(b"payload")
+    deployed = deploys / "current"
+    deployed.symlink_to(release, target_is_directory=True)
+    configured_base = deploys / ".." / "deploys" / "current"
+
+    assert read_bounded_artifact_bytes(deployed / source.name, base_dir=configured_base) == b"payload"
+
+
 def test_reads_absolute_source_under_canonical_base(tmp_path: Path) -> None:
     release = tmp_path / "release"
     release.mkdir()

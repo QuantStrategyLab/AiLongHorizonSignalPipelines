@@ -22,7 +22,7 @@ def read_bounded_artifact_bytes(
         raise SignalValidationError("artifact size limit must be a positive integer")
     _require_safe_open_support()
 
-    raw_base = Path(base_dir).absolute()
+    raw_base = Path(os.path.abspath(os.fspath(base_dir)))
     try:
         canonical_base = raw_base.resolve(strict=True)
     except OSError as exc:
