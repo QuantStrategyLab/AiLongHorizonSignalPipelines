@@ -25,6 +25,9 @@ THEME_MOMENTUM_ARTIFACT_TYPE = "medium_horizon_theme_context"
 THEME_MOMENTUM_HORIZON = "medium"
 THEME_MOMENTUM_HORIZON_WINDOW = "2-12 weeks"
 THEME_MOMENTUM_HORIZON_WINDOW_ZH = "2-12周"
+THEME_MOMENTUM_MODEL_VERSION = "theme-momentum-v1"
+THEME_MOMENTUM_SCORING_VERSION = "theme-momentum-rules-v1"
+THEME_MOMENTUM_EXPIRY_DAYS = 84
 
 
 def utc_now_iso() -> str:
@@ -218,9 +221,12 @@ def build_theme_momentum_snapshot(
 
     taxonomy_versions = sorted({theme.taxonomy_version for theme in themes.values() if theme.taxonomy_version})
     return {
-        "schema_version": "1",
+        "schema_version": "2",
         "as_of": snapshot_as_of,
         "generated_at": (generated_at or dt.datetime.now(dt.UTC)).isoformat().replace("+00:00", "Z"),
+        "expires_at": (parse_price_date(snapshot_as_of) + dt.timedelta(days=THEME_MOMENTUM_EXPIRY_DAYS)).isoformat(),
+        "model_version": THEME_MOMENTUM_MODEL_VERSION,
+        "scoring_version": THEME_MOMENTUM_SCORING_VERSION,
         "mode": "theme_momentum_snapshot",
         "artifact_type": THEME_MOMENTUM_ARTIFACT_TYPE,
         "horizon": THEME_MOMENTUM_HORIZON,
@@ -263,6 +269,29 @@ def build_theme_momentum_snapshot(
             "downstream_use": "Medium-horizon theme context for research ranking and replay only; do not route to broker execution.",
         },
     }
+
+
+def validate_theme_momentum_snapshot(snapshot: Mapping[str, Any]) -> None:
+    """Validate the stable metadata and core shape of v1/v2 theme artifacts."""
+    required = ("schema_version", "as_of", "generated_at", "mode", "artifact_type", "theme_ranks", "data_quality", "policy")
+    missing = [key for key in required if key not in snapshot]
+    if missing:
+        raise ValueError(f"theme momentum snapshot missing required keys: {', '.join(missing)}")
+    schema_version = str(snapshot["schema_version"])
+    if schema_version not in {"1", "2"}:
+        raise ValueError("theme momentum snapshot schema_version must be '1' or '2'")
+    parse_price_date(snapshot["as_of"])
+    generated_at = snapshot["generated_at"]
+    if not isinstance(generated_at, str) or not generated_at.strip():
+        raise ValueError("theme momentum snapshot generated_at must be a non-empty string")
+    if schema_version == "2":
+        for key in ("expires_at", "model_version", "scoring_version"):
+            if not isinstance(snapshot.get(key), str) or not snapshot[key].strip():
+                raise ValueError(f"theme momentum snapshot {key} must be a non-empty string")
+        if parse_price_date(snapshot["expires_at"]) < parse_price_date(snapshot["as_of"]):
+            raise ValueError("theme momentum snapshot expires_at must not be before as_of")
+    if not isinstance(snapshot["theme_ranks"], list) or not isinstance(snapshot["data_quality"], Mapping):
+        raise ValueError("theme momentum snapshot core shape is invalid")
 
 
 def write_theme_momentum_snapshot(snapshot: Mapping[str, Any], path: str | Path) -> Path:

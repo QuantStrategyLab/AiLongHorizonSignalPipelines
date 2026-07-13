@@ -3,7 +3,10 @@ from __future__ import annotations
 import datetime as dt
 
 from research_signal_context_pipelines.price_history import PriceRow
-from research_signal_context_pipelines.theme_momentum import build_theme_momentum_snapshot
+from research_signal_context_pipelines.theme_momentum import (
+    build_theme_momentum_snapshot,
+    validate_theme_momentum_snapshot,
+)
 from research_signal_context_pipelines.theme_universe import SymbolThemeExposure, ThemeDefinition
 
 
@@ -58,6 +61,10 @@ def test_theme_momentum_ranks_strong_broad_theme_first() -> None:
 
     ranked = snapshot["theme_ranks"]
     assert snapshot["artifact_type"] == "medium_horizon_theme_context"
+    assert snapshot["schema_version"] == "2"
+    assert snapshot["expires_at"] == "2025-12-30"
+    assert snapshot["model_version"] == "theme-momentum-v1"
+    assert snapshot["scoring_version"] == "theme-momentum-rules-v1"
     assert snapshot["horizon"] == "medium"
     assert snapshot["horizon_window"] == "2-12 weeks"
     assert snapshot["horizon_window_label"] == "2-12周"
@@ -96,3 +103,31 @@ def test_theme_momentum_records_missing_price_coverage() -> None:
     assert snapshot["data_quality"]["coverage"]["price_coverage_ratio"] == 0.5
     assert snapshot["theme_ranks"][0]["component_count"] == 2
     assert snapshot["theme_ranks"][0]["priced_symbol_count"] == 1
+
+
+def test_theme_momentum_validator_reads_v1_and_v2_metadata() -> None:
+    themes = {
+        "hbm_memory": ThemeDefinition(
+            taxonomy_version="test-v1",
+            theme_id="hbm_memory",
+            theme_name="HBM and memory",
+            sector="technology",
+            horizon="6-24 months",
+            description="memory theme",
+            source_policy="primary evidence required",
+        )
+    }
+    exposures = {"MU": SymbolThemeExposure("MU", ("hbm_memory",), "high", "memory exposure")}
+    snapshot = build_theme_momentum_snapshot(
+        _trend_rows("MU", start_close=50, daily_step=0.22),
+        themes=themes,
+        exposures=exposures,
+        generated_at=dt.datetime(2026, 1, 1, tzinfo=dt.timezone.utc),
+    )
+
+    validate_theme_momentum_snapshot(snapshot)
+    legacy = dict(snapshot)
+    legacy["schema_version"] = "1"
+    for key in ("expires_at", "model_version", "scoring_version"):
+        legacy.pop(key)
+    validate_theme_momentum_snapshot(legacy)

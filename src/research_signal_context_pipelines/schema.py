@@ -28,6 +28,7 @@ REQUIRED_TOP_LEVEL_KEYS = (
 ALLOWED_REGIMES = frozenset({"risk_on", "risk_off", "neutral", "mixed", "unknown"})
 ALLOWED_BIAS_VALUES = frozenset({"positive", "negative", "neutral", "watch", "avoid"})
 REQUIRED_SIGNAL_HORIZON = "1-3 years"
+SUPPORTED_SCHEMA_VERSIONS = frozenset({"1", "2"})
 
 
 def _require_mapping(value: Any, name: str) -> Mapping[str, Any]:
@@ -82,11 +83,15 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     if missing:
         raise SignalValidationError(f"missing required keys: {', '.join(missing)}")
 
-    if _require_string(payload["schema_version"], "schema_version") != "1":
-        raise SignalValidationError("schema_version must be '1'")
+    schema_version = _require_string(payload["schema_version"], "schema_version")
+    if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
+        raise SignalValidationError("schema_version must be '1' or '2'")
     _require_iso_date(payload["as_of"], "as_of")
     _require_iso_datetime(payload["generated_at"], "generated_at")
     _require_iso_date(payload["expires_at"], "expires_at")
+    if schema_version == "2":
+        _require_string(payload.get("model_version"), "model_version")
+        _require_string(payload.get("scoring_version"), "scoring_version")
 
     if payload["mode"] != "shadow":
         raise SignalValidationError("mode must be 'shadow'")

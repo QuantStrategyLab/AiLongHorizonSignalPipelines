@@ -21,6 +21,33 @@ def test_example_signal_is_valid() -> None:
     assert payload["horizon"] == "1-3 years"
 
 
+def test_v2_signal_requires_versioned_model_metadata() -> None:
+    payload = load_example()
+    payload.update(
+        {
+            "schema_version": "2",
+            "model_version": "shadow-v2",
+            "scoring_version": "rules-v2",
+        }
+    )
+
+    validate_signal(payload)
+
+
+def test_v1_signal_remains_readable_without_v2_metadata() -> None:
+    payload = load_example()
+
+    validate_signal(payload)
+
+
+def test_v2_signal_requires_model_and_scoring_versions() -> None:
+    payload = load_example()
+    payload["schema_version"] = "2"
+
+    with pytest.raises(SignalValidationError, match="model_version"):
+        validate_signal(payload)
+
+
 def test_signal_requires_long_horizon_contract() -> None:
     payload = load_example()
     payload["horizon"] = "1-3 months"
