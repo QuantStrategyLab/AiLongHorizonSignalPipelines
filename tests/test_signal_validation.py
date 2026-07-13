@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+import datetime as dt
 from pathlib import Path
 
 import pytest
 
-from research_signal_context_pipelines import SignalValidationError, validate_signal
+from research_signal_context_pipelines import SignalValidationError, validate_latest_signal, validate_signal
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +47,38 @@ def test_v2_signal_requires_model_and_scoring_versions() -> None:
 
     with pytest.raises(SignalValidationError, match="model_version"):
         validate_signal(payload)
+
+
+def test_latest_signal_validation_requires_fresh_linked_theme(tmp_path) -> None:
+    payload = load_example()
+    payload.update({"schema_version": "2", "model_version": "shadow-v2", "scoring_version": "rules-v2"})
+    theme = {
+        "schema_version": "2",
+        "as_of": "2026-01-01",
+        "generated_at": "2026-01-01T00:00:00Z",
+        "expires_at": "2026-01-31",
+        "model_version": "theme-v1",
+        "scoring_version": "rules-v1",
+        "mode": "theme_momentum_snapshot",
+        "artifact_type": "medium_horizon_theme_context",
+        "theme_ranks": [],
+        "data_quality": {"gate": {"status": "pass", "allow_downstream_recommendation": True, "reasons": []}},
+        "policy": {},
+    }
+    theme_path = tmp_path / "theme_momentum_snapshot.json"
+    theme_path.write_text(json.dumps(theme), encoding="utf-8")
+
+    validate_latest_signal(payload, theme_artifact_path=theme_path, reference_date=dt.date(2026, 1, 15))
+
+    with pytest.raises(SignalValidationError, match="expired"):
+        validate_latest_signal(payload, theme_artifact_path=theme_path, reference_date=dt.date(2026, 2, 1))
+
+    validate_latest_signal(
+        payload,
+        theme_artifact_path=theme_path,
+        reference_date=dt.date(2026, 2, 1),
+        allow_expired=True,
+    )
 
 
 def test_signal_requires_long_horizon_contract() -> None:

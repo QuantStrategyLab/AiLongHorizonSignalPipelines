@@ -50,7 +50,7 @@ jobs:
           python-version: "3.11"
 
       - name: Validate existing latest signal if present
-        run: python scripts/validate_latest_signal.py --allow-missing
+        run: python scripts/validate_latest_signal.py --allow-missing --strict-latest
 
       - name: Build point-in-time context bundle
         run: |

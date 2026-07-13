@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import datetime as dt
 
+import pytest
+
 from research_signal_context_pipelines.price_history import PriceRow
 from research_signal_context_pipelines.theme_momentum import (
     build_theme_momentum_snapshot,
@@ -74,6 +76,11 @@ def test_theme_momentum_ranks_strong_broad_theme_first() -> None:
     assert [item["symbol"] for item in ranked[0]["top_symbols"]] == ["MU", "HBM2"]
     assert ranked[0]["momentum_score"] > ranked[1]["momentum_score"]
     assert snapshot["policy"]["execution_allowed"] is False
+    assert snapshot["data_quality"]["gate"] == {
+        "status": "pass",
+        "allow_downstream_recommendation": True,
+        "reasons": [],
+    }
     assert snapshot["data_quality"]["coverage"]["price_coverage_ratio"] == 1.0
 
 
@@ -131,3 +138,41 @@ def test_theme_momentum_validator_reads_v1_and_v2_metadata() -> None:
     for key in ("expires_at", "model_version", "scoring_version"):
         legacy.pop(key)
     validate_theme_momentum_snapshot(legacy)
+
+
+def test_theme_momentum_validator_enforces_strict_schema_freshness_and_gate() -> None:
+    themes = {
+        "hbm_memory": ThemeDefinition(
+            taxonomy_version="test-v1",
+            theme_id="hbm_memory",
+            theme_name="HBM and memory",
+            sector="technology",
+            horizon="6-24 months",
+            description="memory theme",
+            source_policy="primary evidence required",
+        )
+    }
+    snapshot = build_theme_momentum_snapshot(
+        _trend_rows("MU", start_close=50, daily_step=0.22),
+        themes=themes,
+        exposures={"MU": SymbolThemeExposure("MU", ("hbm_memory",), "high", "memory exposure")},
+        as_of="2025-10-07",
+        generated_at=dt.datetime(2025, 10, 7, tzinfo=dt.timezone.utc),
+    )
+
+    validate_theme_momentum_snapshot(
+        snapshot,
+        reference_date=dt.date(2025, 10, 8),
+        compatibility=False,
+        check_freshness=True,
+        require_gate=True,
+    )
+    snapshot["data_quality"]["gate"]["allow_downstream_recommendation"] = False
+    with pytest.raises(ValueError, match="gate"):
+        validate_theme_momentum_snapshot(
+            snapshot,
+            reference_date=dt.date(2025, 10, 8),
+            compatibility=False,
+            check_freshness=True,
+            require_gate=True,
+        )

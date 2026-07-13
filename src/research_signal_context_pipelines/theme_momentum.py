@@ -250,6 +250,11 @@ def build_theme_momentum_snapshot(
         },
         "theme_ranks": theme_ranks,
         "data_quality": {
+            "gate": {
+                "status": "pass",
+                "allow_downstream_recommendation": True,
+                "reasons": [],
+            },
             "coverage": {
                 "configured_symbol_count": len(exposure_symbols),
                 "priced_symbol_count": len(priced_exposure_symbols),
@@ -271,7 +276,15 @@ def build_theme_momentum_snapshot(
     }
 
 
-def validate_theme_momentum_snapshot(snapshot: Mapping[str, Any]) -> None:
+def validate_theme_momentum_snapshot(
+    snapshot: Mapping[str, Any],
+    *,
+    reference_date: dt.date | None = None,
+    compatibility: bool = True,
+    check_freshness: bool = False,
+    require_gate: bool = False,
+    allow_expired: bool = False,
+) -> None:
     """Validate the stable metadata and core shape of v1/v2 theme artifacts."""
     required = ("schema_version", "as_of", "generated_at", "mode", "artifact_type", "theme_ranks", "data_quality", "policy")
     missing = [key for key in required if key not in snapshot]
@@ -280,18 +293,45 @@ def validate_theme_momentum_snapshot(snapshot: Mapping[str, Any]) -> None:
     schema_version = str(snapshot["schema_version"])
     if schema_version not in {"1", "2"}:
         raise ValueError("theme momentum snapshot schema_version must be '1' or '2'")
+    if schema_version == "1" and not compatibility:
+        raise ValueError("schema 1 theme momentum snapshots require explicit compatibility=True")
+    if snapshot["mode"] != "theme_momentum_snapshot":
+        raise ValueError("theme momentum snapshot mode is invalid")
+    if snapshot["artifact_type"] != THEME_MOMENTUM_ARTIFACT_TYPE:
+        raise ValueError("theme momentum snapshot artifact_type is invalid")
     parse_price_date(snapshot["as_of"])
     generated_at = snapshot["generated_at"]
     if not isinstance(generated_at, str) or not generated_at.strip():
-        raise ValueError("theme momentum snapshot generated_at must be a non-empty string")
+        raise ValueError("theme momentum snapshot generated_at must be an ISO datetime")
+    normalized_generated_at = generated_at[:-1] + "+00:00" if generated_at.endswith("Z") else generated_at
+    try:
+        dt.datetime.fromisoformat(normalized_generated_at)
+    except ValueError as exc:
+        raise ValueError("theme momentum snapshot generated_at must be an ISO datetime") from exc
     if schema_version == "2":
         for key in ("expires_at", "model_version", "scoring_version"):
             if not isinstance(snapshot.get(key), str) or not snapshot[key].strip():
                 raise ValueError(f"theme momentum snapshot {key} must be a non-empty string")
-        if parse_price_date(snapshot["expires_at"]) < parse_price_date(snapshot["as_of"]):
+        expires_at = parse_price_date(snapshot["expires_at"])
+        as_of = parse_price_date(snapshot["as_of"])
+        if expires_at < as_of:
             raise ValueError("theme momentum snapshot expires_at must not be before as_of")
+        if check_freshness and reference_date and expires_at < reference_date and not allow_expired:
+            raise ValueError(f"theme momentum snapshot expired on {expires_at.isoformat()}")
     if not isinstance(snapshot["theme_ranks"], list) or not isinstance(snapshot["data_quality"], Mapping):
         raise ValueError("theme momentum snapshot core shape is invalid")
+    if require_gate:
+        gate = snapshot["data_quality"].get("gate")
+        if not isinstance(gate, Mapping):
+            raise ValueError("theme momentum snapshot data_quality.gate is required")
+        if gate.get("status") not in {"pass", "blocked"}:
+            raise ValueError("theme momentum snapshot data_quality.gate.status is invalid")
+        if not isinstance(gate.get("allow_downstream_recommendation"), bool):
+            raise ValueError("theme momentum snapshot data_quality.gate.allow_downstream_recommendation must be boolean")
+        if not isinstance(gate.get("reasons"), list):
+            raise ValueError("theme momentum snapshot data_quality.gate.reasons must be a list")
+        if gate["status"] != ("pass" if gate["allow_downstream_recommendation"] else "blocked"):
+            raise ValueError("theme momentum snapshot data_quality.gate is inconsistent")
 
 
 def write_theme_momentum_snapshot(snapshot: Mapping[str, Any], path: str | Path) -> Path:

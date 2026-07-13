@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 
@@ -128,6 +130,48 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     if policy.get("execution_allowed") is not False:
         raise SignalValidationError("policy.execution_allowed must be false")
     _require_string(policy.get("downstream_use"), "policy.downstream_use")
+
+
+def validate_latest_signal(
+    payload: Mapping[str, Any],
+    *,
+    reference_date: dt.date | None = None,
+    theme_artifact_path: str | Path | None = None,
+    allow_expired: bool = False,
+) -> None:
+    """Validate a current signal and its linked theme artifact fail-closed."""
+    validate_signal(payload)
+    effective_date = reference_date or dt.datetime.now(dt.UTC).date()
+    if not allow_expired and dt.date.fromisoformat(str(payload["expires_at"])) < effective_date:
+        raise SignalValidationError(f"signal artifact expired on {payload['expires_at']}")
+
+    source_paths = list(payload.get("evidence", {}).get("sources", []))
+    artifact = Path(theme_artifact_path) if theme_artifact_path else next(
+        (Path(source) for source in source_paths if "theme_momentum_snapshot" in str(source)), None
+    )
+    if artifact is None:
+        raise SignalValidationError("latest signal requires a referenced theme momentum artifact")
+    if not artifact.exists():
+        raise SignalValidationError(f"referenced theme momentum artifact not found: {artifact}")
+    try:
+        theme_payload = json.loads(artifact.read_text(encoding="utf-8"))
+        from .theme_momentum import validate_theme_momentum_snapshot
+
+        validate_theme_momentum_snapshot(
+            theme_payload,
+            reference_date=effective_date,
+            compatibility=False,
+            check_freshness=True,
+            require_gate=True,
+            allow_expired=allow_expired,
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        if isinstance(exc, SignalValidationError):
+            raise
+        raise SignalValidationError(f"invalid referenced theme momentum artifact: {exc}") from exc
+    gate = theme_payload["data_quality"]["gate"]
+    if gate["allow_downstream_recommendation"] is not True:
+        raise SignalValidationError("referenced theme momentum artifact is blocked by data_quality.gate")
 
 
 def _validate_bias_mapping(mapping: Mapping[str, Any], name: str) -> None:
