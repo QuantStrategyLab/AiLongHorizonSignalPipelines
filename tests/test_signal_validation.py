@@ -81,6 +81,12 @@ def test_latest_signal_validation_requires_fresh_linked_theme(tmp_path) -> None:
     )
 
 
+def test_latest_signal_rejects_v1_with_controlled_error(tmp_path) -> None:
+    payload = load_example()
+    with pytest.raises(SignalValidationError, match="schema v2"):
+        validate_latest_signal(payload, theme_artifact_path=tmp_path / "missing.json")
+
+
 def test_signal_requires_long_horizon_contract() -> None:
     payload = load_example()
     payload["horizon"] = "1-3 months"

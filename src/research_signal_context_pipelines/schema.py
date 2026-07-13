@@ -141,6 +141,8 @@ def validate_latest_signal(
 ) -> None:
     """Validate a current signal and its linked theme artifact fail-closed."""
     validate_signal(payload)
+    if str(payload.get("schema_version")) != "2":
+        raise SignalValidationError("strict latest validation requires signal schema v2")
     effective_date = reference_date or dt.datetime.now(dt.UTC).date()
     if not allow_expired and dt.date.fromisoformat(str(payload["expires_at"])) < effective_date:
         raise SignalValidationError(f"signal artifact expired on {payload['expires_at']}")
