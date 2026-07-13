@@ -107,6 +107,15 @@ def test_final_symlink_is_rejected_without_following_it(tmp_path: Path) -> None:
         validate_latest_signal(signal_payload("alias.json"), signal_base_dir=tmp_path)
 
 
+def test_absolute_declared_symlink_is_rejected_without_resolving_identity(tmp_path: Path) -> None:
+    write_snapshot(tmp_path)
+    alias = tmp_path / "absolute-alias.json"
+    alias.symlink_to(tmp_path / "theme_momentum_snapshot.json")
+
+    with pytest.raises(SignalValidationError, match="no-follow|symlink"):
+        validate_latest_signal(signal_payload(str(alias)))
+
+
 def test_descriptor_read_rejects_symlink_swap_after_bounds_check(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     path = write_snapshot(tmp_path)
     outside = tmp_path.parent / "outside.json"
@@ -152,6 +161,35 @@ def test_declaration_is_read_once_and_same_bytes_are_hashed_and_decoded(tmp_path
     monkeypatch.setattr(os, "open", open_once)
     validate_latest_signal(payload, signal_base_dir=tmp_path)
     assert calls == 2
+
+
+@pytest.mark.parametrize("generated_at", ["2026-06-27", "2026-06-27T00:00:00"])
+def test_generated_at_requires_time_and_explicit_timezone(tmp_path: Path, generated_at: str) -> None:
+    payload = signal_payload()
+    payload["generated_at"] = generated_at
+    write_snapshot(tmp_path)
+
+    with pytest.raises(SignalValidationError, match="ISO datetime"):
+        validate_latest_signal(payload, signal_base_dir=tmp_path)
+
+    payload = signal_payload()
+    write_snapshot(tmp_path, generated_at=generated_at)
+    with pytest.raises(SignalValidationError, match="ISO datetime"):
+        validate_latest_signal(payload, signal_base_dir=tmp_path)
+
+
+def test_non_regular_and_oversized_declarations_fail_closed(tmp_path: Path) -> None:
+    fifo = tmp_path / "theme_momentum_snapshot.json"
+    os.mkfifo(fifo)
+    with pytest.raises(SignalValidationError, match="regular file"):
+        validate_latest_signal(signal_payload(), signal_base_dir=tmp_path)
+
+    fifo.unlink()
+    fifo.write_bytes(b"{}")
+    with fifo.open("ab") as stream:
+        stream.truncate(linkage.MAX_JSON_ARTIFACT_BYTES + 1)
+    with pytest.raises(SignalValidationError, match="maximum size"):
+        validate_latest_signal(signal_payload(), signal_base_dir=tmp_path)
 
 
 def test_bad_hash_and_as_of_mismatch_are_validation_errors(tmp_path: Path) -> None:

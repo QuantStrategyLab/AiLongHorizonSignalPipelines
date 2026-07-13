@@ -6,6 +6,7 @@ import datetime as dt
 import errno
 import os
 import re
+import stat
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,7 @@ from .theme_momentum import validate_theme_momentum_snapshot
 
 _SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 _OPEN_SUPPORTS_DIR_FD = os.open in getattr(os, "supports_dir_fd", set())
+MAX_JSON_ARTIFACT_BYTES = 4 * 1024 * 1024
 
 
 def validate_latest_signal(
@@ -93,14 +95,18 @@ def _resolve_source_path(source: str, base: Path | None) -> Path:
 
 
 def _read_declaration(path: Path, base: Path | None, declared_source: str) -> bytes:
-    if getattr(os, "O_NOFOLLOW", None) is None or getattr(os, "O_DIRECTORY", None) is None:
+    if (
+        getattr(os, "O_NOFOLLOW", None) is None
+        or getattr(os, "O_DIRECTORY", None) is None
+        or getattr(os, "O_NONBLOCK", None) is None
+    ):
         raise SignalValidationError("secure descriptor-based source reading is unavailable")
     if not _OPEN_SUPPORTS_DIR_FD:
         raise SignalValidationError("secure openat source reading is unavailable")
     fd = -1
     try:
         if base is None:
-            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+            fd = os.open(Path(declared_source), os.O_RDONLY | os.O_NOFOLLOW | getattr(os, "O_NONBLOCK", 0))
         else:
             raw_path = Path(declared_source)
             try:
@@ -117,11 +123,18 @@ def _read_declaration(path: Path, base: Path | None, declared_source: str) -> by
                 fd = next_fd
             final_fd = -1
             try:
-                final_fd = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW, dir_fd=fd)
+                final_fd = os.open(
+                    parts[-1], os.O_RDONLY | os.O_NOFOLLOW | getattr(os, "O_NONBLOCK", 0), dir_fd=fd
+                )
             finally:
                 parent_fd = fd
                 fd = final_fd
                 os.close(parent_fd)
+        metadata = os.fstat(fd)
+        if not stat.S_ISREG(metadata.st_mode):
+            raise SignalValidationError("declaration source must be a regular file")
+        if metadata.st_size > MAX_JSON_ARTIFACT_BYTES:
+            raise SignalValidationError("declaration source exceeds maximum size")
         with os.fdopen(fd, "rb") as stream:
             fd = -1
             return stream.read()
@@ -181,5 +194,5 @@ def _parse_datetime(value: Any, name: str) -> dt.datetime:
     except ValueError as exc:
         raise SignalValidationError(f"{name} must be an ISO datetime") from exc
     if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=dt.timezone.utc)
+        raise SignalValidationError(f"{name} must be an ISO datetime with an explicit timezone")
     return parsed.astimezone(dt.timezone.utc)
