@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import pytest
 
-from research_signal_context_pipelines import SignalValidationError, validate_signal
+from research_signal_context_pipelines import SignalValidationError, validate_latest_signal, validate_signal
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +47,61 @@ def test_v2_signal_requires_model_and_scoring_versions() -> None:
 
     with pytest.raises(SignalValidationError, match="model_version"):
         validate_signal(payload)
+
+
+def _strict_signal(*, source: str, as_of: str = "2026-01-01", source_sha256: str | None = None) -> dict:
+    payload = load_example()
+    payload.update(
+        {
+            "schema_version": "2",
+            "as_of": as_of,
+            "model_version": "shadow-v2",
+            "scoring_version": "rules-v2",
+        }
+    )
+    payload["evidence"]["sources"] = [source]
+    if source_sha256:
+        payload["evidence"]["source_hashes"] = {source: source_sha256}
+    return payload
+
+
+def _theme_snapshot(*, as_of: str = "2026-01-01") -> dict:
+    return {
+        "schema_version": "2",
+        "as_of": as_of,
+        "generated_at": f"{as_of}T00:00:00Z",
+        "expires_at": "2026-12-31",
+        "model_version": "theme-v1",
+        "scoring_version": "rules-v1",
+        "mode": "theme_momentum_snapshot",
+        "artifact_type": "medium_horizon_theme_context",
+        "theme_ranks": [],
+        "data_quality": {},
+        "policy": {},
+    }
+
+
+def test_strict_latest_rejects_override_not_declared_by_signal(tmp_path) -> None:
+    declared = tmp_path / "declared-theme_momentum_snapshot.json"
+    override = tmp_path / "other-theme_momentum_snapshot.json"
+    declared.write_text(json.dumps(_theme_snapshot()), encoding="utf-8")
+    override.write_text(json.dumps(_theme_snapshot()), encoding="utf-8")
+    payload = _strict_signal(
+        source=str(declared),
+        source_sha256=hashlib.sha256(declared.read_bytes()).hexdigest(),
+    )
+
+    with pytest.raises(SignalValidationError, match="declared theme source"):
+        validate_latest_signal(payload, theme_artifact_path=override)
+
+
+def test_strict_latest_rejects_linked_theme_as_of_mismatch(tmp_path) -> None:
+    theme_path = tmp_path / "theme_momentum_snapshot.json"
+    theme_path.write_text(json.dumps(_theme_snapshot(as_of="2025-12-31")), encoding="utf-8")
+    payload = _strict_signal(source=str(theme_path))
+
+    with pytest.raises(SignalValidationError, match="as_of"):
+        validate_latest_signal(payload, theme_artifact_path=theme_path)
 
 
 def test_signal_requires_long_horizon_contract() -> None:

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import json
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 
@@ -152,3 +155,53 @@ def _validate_bias_value(value: Any, name: str) -> None:
                 _require_string_list(raw[optional_list_key], f"{name}.{optional_list_key}", allow_empty=True)
     if bias not in ALLOWED_BIAS_VALUES:
         raise SignalValidationError(f"{name} must be one of: {', '.join(sorted(ALLOWED_BIAS_VALUES))}")
+
+
+def validate_latest_signal(
+    payload: Mapping[str, Any],
+    *,
+    theme_artifact_path: str | Path | None = None,
+) -> None:
+    """Validate a v2 signal against its declared theme artifact linkage."""
+    validate_signal(payload)
+    if str(payload.get("schema_version")) != "2":
+        raise SignalValidationError("strict latest validation requires signal schema v2")
+
+    evidence = _require_mapping(payload["evidence"], "evidence")
+    sources = _require_string_list(evidence.get("sources"), "evidence.sources")
+    theme_sources = [source for source in sources if "theme_momentum_snapshot" in Path(source).name]
+    if len(theme_sources) != 1:
+        raise SignalValidationError("latest signal must declare exactly one theme source")
+    declared_source = theme_sources[0]
+    declared_path = Path(declared_source).resolve()
+    artifact_path = Path(theme_artifact_path).resolve() if theme_artifact_path else declared_path
+    if artifact_path != declared_path:
+        raise SignalValidationError("theme artifact override must match the declared theme source")
+    if not artifact_path.exists():
+        raise SignalValidationError(f"declared theme artifact not found: {artifact_path}")
+
+    source_hashes = evidence.get("source_hashes", {})
+    if source_hashes is None:
+        source_hashes = {}
+    if not isinstance(source_hashes, Mapping):
+        raise SignalValidationError("evidence.source_hashes must be an object")
+    expected_hash = source_hashes.get(declared_source) or source_hashes.get(str(declared_path))
+    if expected_hash is not None:
+        _require_string(expected_hash, "evidence.source_hashes value")
+        digest = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+        if digest != expected_hash:
+            raise SignalValidationError("declared theme artifact sha256 does not match")
+
+    try:
+        theme_payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+        from .theme_momentum import validate_theme_momentum_snapshot
+
+        validate_theme_momentum_snapshot(theme_payload)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        raise SignalValidationError(f"invalid declared theme artifact: {exc}") from exc
+    if str(theme_payload.get("schema_version")) != "2":
+        raise SignalValidationError("strict latest validation requires theme schema v2")
+    if str(theme_payload.get("as_of")) != str(payload["as_of"]):
+        raise SignalValidationError(
+            f"signal/theme as_of mismatch: signal={payload['as_of']} theme={theme_payload.get('as_of')}"
+        )
