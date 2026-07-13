@@ -58,6 +58,10 @@ def test_theme_momentum_ranks_strong_broad_theme_first() -> None:
 
     ranked = snapshot["theme_ranks"]
     assert snapshot["artifact_type"] == "medium_horizon_theme_context"
+    assert snapshot["schema_version"] == "2"
+    assert snapshot["expires_at"] == "2025-12-30"
+    assert snapshot["model_version"] == "theme-momentum-v1"
+    assert snapshot["scoring_version"] == "theme-momentum-rules-v1"
     assert snapshot["horizon"] == "medium"
     assert snapshot["horizon_window"] == "2-12 weeks"
     assert snapshot["horizon_window_label"] == "2-12周"

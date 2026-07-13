@@ -25,6 +25,9 @@ THEME_MOMENTUM_ARTIFACT_TYPE = "medium_horizon_theme_context"
 THEME_MOMENTUM_HORIZON = "medium"
 THEME_MOMENTUM_HORIZON_WINDOW = "2-12 weeks"
 THEME_MOMENTUM_HORIZON_WINDOW_ZH = "2-12周"
+THEME_MOMENTUM_MODEL_VERSION = "theme-momentum-v1"
+THEME_MOMENTUM_SCORING_VERSION = "theme-momentum-rules-v1"
+THEME_MOMENTUM_EXPIRY_DAYS = 84
 
 
 def utc_now_iso() -> str:
@@ -218,9 +221,12 @@ def build_theme_momentum_snapshot(
 
     taxonomy_versions = sorted({theme.taxonomy_version for theme in themes.values() if theme.taxonomy_version})
     return {
-        "schema_version": "1",
+        "schema_version": "2",
         "as_of": snapshot_as_of,
         "generated_at": (generated_at or dt.datetime.now(dt.UTC)).isoformat().replace("+00:00", "Z"),
+        "expires_at": (parse_price_date(snapshot_as_of) + dt.timedelta(days=THEME_MOMENTUM_EXPIRY_DAYS)).isoformat(),
+        "model_version": THEME_MOMENTUM_MODEL_VERSION,
+        "scoring_version": THEME_MOMENTUM_SCORING_VERSION,
         "mode": "theme_momentum_snapshot",
         "artifact_type": THEME_MOMENTUM_ARTIFACT_TYPE,
         "horizon": THEME_MOMENTUM_HORIZON,
