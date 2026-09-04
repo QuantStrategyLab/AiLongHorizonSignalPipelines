@@ -41,6 +41,7 @@ def validate_manifest_v2(
     signal: Mapping[str, Any],
     manifest: Mapping[str, Any],
 ) -> None:
+    manifest = _require_mapping(manifest, "manifest")
     schema_version = manifest.get("schema_version")
     if schema_version in ("1", 1):
         raise SignalValidationError("legacy_untrusted: manifest schema_version 1 cannot satisfy immutable provenance")
