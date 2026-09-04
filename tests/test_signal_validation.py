@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
 from research_signal_context_pipelines import SignalValidationError, validate_signal
+from scripts import post_shadow_signal_request as shadow_issue
+from scripts import validate_latest_signal as signal_validator
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,3 +140,72 @@ def test_committed_latest_signal_covers_advisor_long_context() -> None:
     assert payload.get("symbol_theme_exposure")
     covered_symbols = set(payload.get("symbol_bias", {})) | set(payload.get("symbol_theme_exposure", {}))
     assert {"MU", "INTC", "AMD", "VRT", "DELL"} <= covered_symbols
+
+
+def _write_v2_artifact_pair(tmp_path: Path) -> tuple[Path, dict]:
+    signal_path = tmp_path / "latest_signal.json"
+    signal = load_example()
+    signal_bytes = json.dumps(signal, sort_keys=True).encode("utf-8")
+    signal_path.write_bytes(signal_bytes)
+    manifest = {
+        "manifest_type": "research_signal_context",
+        "schema_version": 2,
+        "artifact": {
+            "path": "data/output/latest_signal.json",
+            "sha256": hashlib.sha256(signal_bytes).hexdigest(),
+        },
+        "as_of": signal["as_of"],
+        "generated_at": signal["generated_at"],
+        "expires_at": signal["expires_at"],
+        "mode": signal["mode"],
+        "producer": {
+            "repository": "QuantStrategyLab/ResearchSignalContextPipelines",
+            "commit_sha": "a" * 40,
+        },
+        "input_digest": "sha256:" + "b" * 64,
+        "policy": {"execution_allowed": False},
+    }
+    return signal_path, manifest
+
+
+def test_manifest_v2_rejects_stale_signal_digest(tmp_path: Path) -> None:
+    signal_path, manifest = _write_v2_artifact_pair(tmp_path)
+    manifest["artifact"]["sha256"] = "0" * 64
+
+    with pytest.raises(SignalValidationError, match="artifact.sha256"):
+        signal_validator.validate_manifest_v2(signal_path, load_example(), manifest)
+
+
+def test_manifest_v2_rejects_missing_required_input_digest(tmp_path: Path) -> None:
+    signal_path, manifest = _write_v2_artifact_pair(tmp_path)
+    del manifest["input_digest"]
+
+    with pytest.raises(SignalValidationError, match="input_digest"):
+        signal_validator.validate_manifest_v2(signal_path, load_example(), manifest)
+
+
+def test_manifest_v2_rejects_mutable_producer_ref(tmp_path: Path) -> None:
+    signal_path, manifest = _write_v2_artifact_pair(tmp_path)
+    manifest["producer"]["commit_sha"] = "main"
+
+    with pytest.raises(SignalValidationError, match="producer.commit_sha"):
+        signal_validator.validate_manifest_v2(signal_path, load_example(), manifest)
+
+
+def test_manifest_v1_is_explicitly_legacy_untrusted(tmp_path: Path) -> None:
+    signal_path, _ = _write_v2_artifact_pair(tmp_path)
+
+    with pytest.raises(SignalValidationError, match="legacy_untrusted"):
+        signal_validator.validate_manifest_v2(signal_path, load_example(), {"schema_version": "1"})
+
+
+def test_shadow_request_binds_context_digest_to_immutable_commit(tmp_path: Path) -> None:
+    context_path = tmp_path / "context.json"
+    context_path.write_bytes(b'{"as_of":"2026-05-29"}')
+
+    provenance = shadow_issue.build_immutable_provenance(context_path, "c" * 40)
+
+    assert provenance == {
+        "producer_commit_sha": "c" * 40,
+        "input_digest": "sha256:" + hashlib.sha256(context_path.read_bytes()).hexdigest(),
+    }
