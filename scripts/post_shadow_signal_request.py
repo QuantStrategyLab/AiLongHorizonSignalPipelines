@@ -4,9 +4,11 @@ from __future__ import annotations
 import argparse
 from collections.abc import Mapping
 import datetime as dt
+import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -16,6 +18,7 @@ from typing import Any
 
 DEFAULT_API_URL = "https://api.github.com"
 DEFAULT_LABEL = "long-horizon-shadow"
+COMMIT_SHA_PATTERN = re.compile(r"[0-9a-fA-F]{40}")
 
 
 def github_request(method: str, url: str, token: str, payload: dict[str, Any] | None = None) -> Any:
@@ -75,6 +78,15 @@ def load_context_bundle(path: str | None) -> dict[str, Any] | None:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def build_immutable_provenance(context_path: Path, producer_commit_sha: str) -> dict[str, str]:
+    if not COMMIT_SHA_PATTERN.fullmatch(producer_commit_sha):
+        raise ValueError("producer commit must be an immutable 40-hex commit")
+    return {
+        "producer_commit_sha": producer_commit_sha,
+        "input_digest": f"sha256:{hashlib.sha256(context_path.read_bytes()).hexdigest()}",
+    }
+
+
 def resolve_as_of_date(raw_as_of_date: str | None, context_bundle: Mapping[str, Any] | None) -> str:
     if raw_as_of_date:
         return raw_as_of_date
@@ -114,6 +126,7 @@ def build_issue_body(
     provider: str,
     bridge_repository: str,
     context_bundle: Mapping[str, Any] | None = None,
+    immutable_provenance: Mapping[str, str] | None = None,
 ) -> str:
     sections = [
         [
@@ -141,6 +154,41 @@ def build_issue_body(
             "",
         ],
         [context_markdown(context_bundle)],
+        [
+            "",
+            "## Immutable Provenance Contract",
+            "",
+            "Any new signal must update `latest_signal.json` and its sibling manifest in the same PR.",
+            "The manifest must use this v2 contract; v1 is legacy_untrusted and cannot authorize downstream use.",
+            "",
+            "```json",
+            json.dumps(
+                {
+                    "manifest_type": "research_signal_context",
+                    "schema_version": 2,
+                    "artifact": {
+                        "path": "data/output/latest_signal.json",
+                        "sha256": "sha256 of exact latest_signal.json bytes",
+                    },
+                    "as_of": "copy exactly from signal",
+                    "generated_at": "copy exactly from signal",
+                    "expires_at": "copy exactly from signal",
+                    "mode": "copy exactly from signal",
+                    "producer": {
+                        "repository": "QuantStrategyLab/ResearchSignalContextPipelines",
+                        "commit_sha": (immutable_provenance or {}).get("producer_commit_sha", "required 40-hex commit"),
+                    },
+                    "input_digest": (immutable_provenance or {}).get("input_digest", "required sha256 digest"),
+                    "policy": {"execution_allowed": False},
+                },
+                ensure_ascii=True,
+                indent=2,
+                sort_keys=True,
+            ),
+            "```",
+            "",
+            "Do not add a publisher or publication self-commit field. Do not upgrade existing v1 artifacts by hand.",
+        ],
         [
             "",
             "Do not infer historical AI signals that were not generated point-in-time.",
@@ -201,16 +249,28 @@ def main() -> int:
     if not token:
         print("GITHUB_TOKEN is required", file=sys.stderr)
         return 1
+    if not args.context_file:
+        print("immutable provenance requires --context-file", file=sys.stderr)
+        return 1
 
     context_bundle = load_context_bundle(args.context_file)
     as_of_date = resolve_as_of_date(args.as_of_date, context_bundle)
     title = build_issue_title(as_of_date)
+    try:
+        immutable_provenance = build_immutable_provenance(
+            Path(args.context_file),
+            os.environ.get("GITHUB_SHA", args.source_ref),
+        )
+    except (OSError, ValueError) as exc:
+        print(f"immutable provenance unavailable: {exc}", file=sys.stderr)
+        return 1
     body = build_issue_body(
         as_of_date=as_of_date,
         source_ref=args.source_ref,
         provider=args.provider,
         bridge_repository=args.bridge_repository,
         context_bundle=context_bundle,
+        immutable_provenance=immutable_provenance,
     )
     try:
         action, issue_number, issue_url = upsert_issue(
