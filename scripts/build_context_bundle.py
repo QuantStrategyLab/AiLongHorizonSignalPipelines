@@ -20,6 +20,7 @@ from research_signal_context_pipelines.context_bundle import (  # noqa: E402
     write_context_bundle,
 )
 from research_signal_context_pipelines.research_context_adapter import ResearchContextAdapter  # noqa: E402
+from research_signal_context_pipelines.price_history import parse_price_date  # noqa: E402
 from research_signal_context_pipelines.theme_universe import (  # noqa: E402
     build_theme_context,
     load_symbol_theme_exposure,
@@ -70,11 +71,18 @@ def main() -> int:
 
     web_research_context = None
     if args.web_research_sources:
-        web_research_context = ResearchContextAdapter(
+        research_adapter = ResearchContextAdapter(
             Path(args.web_research_sources),
             timeout_seconds=args.web_research_timeout,
             max_entries=args.web_research_max_entries,
-        ).build_context(pit_timestamp=generated_at)
+        )
+        end_date = parse_price_date(args.end_date) if args.end_date else None
+        if end_date is not None and end_date < generated_at.date():
+            # Calendar-date marker only, not an asserted market-close timestamp.
+            historical_cutoff = dt.datetime.combine(end_date, dt.time.min, tzinfo=dt.timezone.utc)
+            web_research_context = research_adapter.build_context(pit_timestamp=historical_cutoff)
+        else:
+            web_research_context = research_adapter.build_context()
 
     try:
         bundle = build_context_from_source(
