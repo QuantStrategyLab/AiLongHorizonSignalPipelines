@@ -252,12 +252,18 @@ class ResearchContextAdapter:
         self.max_entries = int(max_entries)
 
     def build_context(self, *, pit_timestamp: dt.datetime | None = None) -> dict[str, Any]:
-        fetched_at = _isoformat_utc(pit_timestamp)
+        """Fetch current observations; past cutoffs require saved, then-visible data."""
+        started_at = dt.datetime.now(dt.timezone.utc)
+        cutoff = dt.datetime.fromisoformat(_isoformat_utc(pit_timestamp)) if pit_timestamp is not None else None
         context: dict[str, Any] = {
-            "pit_timestamp": fetched_at,
+            "pit_timestamp": _isoformat_utc(cutoff or started_at),
             "research_sources": [],
+            "source_count": 0,
             "warnings": [],
         }
+        if cutoff is not None and cutoff < started_at:
+            context["warnings"].append("historical live-web research is unsupported; saved observations visible at the requested cutoff are required")
+            return context
         if not self.sources_path.exists():
             context["warnings"].append(f"research sources file not found: {self.sources_path}")
             return context
@@ -285,10 +291,15 @@ class ResearchContextAdapter:
                 with urlopen(request, timeout=self.timeout_seconds) as response:  # noqa: S310 - operator-controlled research fetch.
                     body = response.read()
                     content_type = response.headers.get_content_type() if hasattr(response.headers, "get_content_type") else None
+                fetched_time = dt.datetime.now(dt.timezone.utc)
+                fetched_at = _isoformat_utc(fetched_time)
             except (OSError, URLError, TimeoutError, ValueError) as exc:
                 warnings.append(f"failed to fetch research source {source.url}: {type(exc).__name__}: {exc}")
                 continue
 
+            if cutoff is not None and fetched_time > cutoff:
+                warnings.append("skipped research response fetched after the requested cutoff")
+                continue
             kind = _source_kind(source, content_type=content_type, body=body)
             try:
                 entries = _feed_entries(body, source_url=source.url, fetched_at=fetched_at) if kind == "rss" else [_html_entry(body, source_url=source.url, fetched_at=fetched_at)]
@@ -299,8 +310,18 @@ class ResearchContextAdapter:
             for entry in entries:
                 if len(collected) >= self.max_entries:
                     break
+                published_at = entry.get("published_at")
+                if not published_at:
+                    warnings.append("skipped research entry with missing or invalid publication time")
+                    continue
+                if dt.datetime.fromisoformat(published_at) > fetched_time:
+                    warnings.append("skipped research entry with publication time after its observed fetch time")
+                    continue
                 collected.append(entry)
 
+        if cutoff is None:
+            # Current-query cutoff is completion, not a timestamp before I/O.
+            context["pit_timestamp"] = _isoformat_utc(None)
         context["research_sources"] = collected
         context["source_count"] = len(collected)
         return context
