@@ -231,3 +231,35 @@ def test_confidence_rejects_nan() -> None:
 
     with pytest.raises(SignalValidationError, match="finite|between 0 and 1"):
         validate_signal(payload)
+
+
+def test_missing_available_at_is_allowed() -> None:
+    payload = load_example()
+    payload.pop("available_at", None)
+
+    validate_signal(payload)
+
+
+def test_available_at_after_generated_at_is_allowed() -> None:
+    payload = load_example()
+    payload["generated_at"] = "2026-05-28T12:00:00Z"
+    payload["available_at"] = "2026-05-28T22:00:00Z"
+
+    validate_signal(payload)
+
+
+def test_available_at_before_generated_at_is_rejected() -> None:
+    payload = load_example()
+    payload["generated_at"] = "2026-05-28T22:00:00Z"
+    payload["available_at"] = "2026-05-28T12:00:00Z"
+
+    with pytest.raises(SignalValidationError, match="available_at must be >= generated_at"):
+        validate_signal(payload)
+
+
+def test_available_at_present_but_invalid_is_rejected() -> None:
+    payload = load_example()
+    payload["available_at"] = ""
+
+    with pytest.raises(SignalValidationError, match="available_at"):
+        validate_signal(payload)

@@ -53,8 +53,10 @@ def decision_datetime_for_date(date: dt.date) -> dt.datetime:
 
 
 def signal_available_at(signal: dict[str, Any]) -> dt.datetime:
-    raw = signal.get("available_at", signal["generated_at"])
-    return parse_datetime(str(raw))
+    generated = parse_datetime(str(signal["generated_at"]))
+    if "available_at" not in signal:
+        return generated
+    return max(generated, parse_datetime(str(signal["available_at"])))
 
 
 def load_price_history(path: Path, *, symbol: str) -> list[PricePoint]:
