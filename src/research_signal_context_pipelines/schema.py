@@ -64,6 +64,15 @@ def _require_iso_datetime(value: Any, name: str) -> str:
     return text
 
 
+def _parse_iso_datetime_utc(value: Any, name: str) -> dt.datetime:
+    text = _require_iso_datetime(value, name)
+    normalized = text[:-1] + "+00:00" if text.endswith("Z") else text
+    parsed = dt.datetime.fromisoformat(normalized)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
+
+
 def _require_string_list(value: Any, name: str, *, allow_empty: bool = False) -> list[str]:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         raise SignalValidationError(f"{name} must be a list of strings")
@@ -91,8 +100,12 @@ def validate_signal(payload: Mapping[str, Any]) -> None:
     if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
         raise SignalValidationError("schema_version must be '1' or '2'")
     _require_iso_date(payload["as_of"], "as_of")
-    _require_iso_datetime(payload["generated_at"], "generated_at")
+    generated_at = _parse_iso_datetime_utc(payload["generated_at"], "generated_at")
     _require_iso_date(payload["expires_at"], "expires_at")
+    if "available_at" in payload:
+        available_at = _parse_iso_datetime_utc(payload["available_at"], "available_at")
+        if available_at < generated_at:
+            raise SignalValidationError("available_at must be >= generated_at")
     if schema_version == "2":
         _require_string(payload.get("model_version"), "model_version")
         _require_string(payload.get("scoring_version"), "scoring_version")

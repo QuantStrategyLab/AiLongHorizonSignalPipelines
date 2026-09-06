@@ -5,6 +5,8 @@ import datetime as dt
 import json
 from pathlib import Path
 
+import pytest
+
 from research_signal_context_pipelines.overlay_backtest import (
     OverlayPolicy,
     PricePoint,
@@ -13,8 +15,10 @@ from research_signal_context_pipelines.overlay_backtest import (
     load_price_history,
     load_signals,
     signal_active_on,
+    signal_available_at,
     signal_for_date,
 )
+from research_signal_context_pipelines.schema import SignalValidationError, validate_signal
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +74,46 @@ def test_signal_active_on_uses_available_at_when_present() -> None:
 
     assert signal_active_on(signal, dt.date(2026, 2, 6), decision_time=morning) is False
     assert signal_for_date([signal], dt.date(2026, 2, 9)) is not None
+
+
+def test_signal_available_at_clamps_early_available_at_to_generated_at() -> None:
+    signal = _example_signal(
+        generated_at="2026-02-20T22:00:00Z",
+        available_at="2026-02-06T00:00:00Z",
+    )
+
+    assert signal_available_at(signal) == dt.datetime(2026, 2, 20, 22, 0, tzinfo=dt.timezone.utc)
+
+
+def test_early_available_at_does_not_rewrite_earlier_overlay_path() -> None:
+    prices = [
+        PricePoint(date=dt.date(2026, 2, 6), close=100.0),
+        PricePoint(date=dt.date(2026, 2, 13), close=90.0),
+        PricePoint(date=dt.date(2026, 2, 20), close=80.0),
+        PricePoint(date=dt.date(2026, 2, 27), close=70.0),
+    ]
+    late = _example_signal(
+        as_of="2026-02-06",
+        generated_at="2026-02-20T22:00:00Z",
+        expires_at="2026-03-19",
+        regime="risk_off",
+        confidence=0.9,
+        risk_flags=["liquidity_stress"],
+    )
+    early_available = copy.deepcopy(late)
+    early_available["available_at"] = "2026-02-06T00:00:00Z"
+
+    without_signal = backtest_overlay(prices, [])
+    with_late = backtest_overlay(prices, [late])
+    with_early = backtest_overlay(prices, [early_available])
+
+    # Defense in depth: early available_at must not rewrite pre-generation history.
+    assert with_early["overlay"]["final_equity"] == with_late["overlay"]["final_equity"]
+    assert with_early["overlay"]["final_equity"] == without_signal["overlay"]["final_equity"]
+    assert with_early["overlay"]["avg_exposure"] == without_signal["overlay"]["avg_exposure"]
+
+    with pytest.raises(SignalValidationError, match="available_at must be >= generated_at"):
+        validate_signal(early_available)
 
 
 def test_future_generated_at_does_not_rewrite_earlier_overlay_path() -> None:
