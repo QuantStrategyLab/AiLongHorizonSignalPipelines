@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import json
 from pathlib import Path
@@ -7,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from research_signal_context_pipelines import SignalValidationError, validate_signal
+from research_signal_context_pipelines.overlay_backtest import signal_active_on
 from scripts import post_shadow_signal_request as shadow_issue
 from scripts import validate_latest_signal as signal_validator
 
@@ -22,6 +24,18 @@ def test_example_signal_is_valid() -> None:
     payload = load_example()
     validate_signal(payload)
     assert payload["horizon"] == "1-3 years"
+
+
+def test_validated_signal_is_inactive_before_generated_at() -> None:
+    payload = load_example()
+    payload["as_of"] = "2026-05-28"
+    payload["generated_at"] = "2026-05-28T22:00:00Z"
+    payload["expires_at"] = "2026-06-30"
+    validate_signal(payload)
+
+    morning = dt.datetime(2026, 5, 28, 14, 30, tzinfo=dt.timezone.utc)
+    assert signal_active_on(payload, dt.date(2026, 5, 28), decision_time=morning) is False
+    assert signal_active_on(payload, dt.date(2026, 5, 29)) is True
 
 
 def test_v2_signal_requires_versioned_model_metadata() -> None:
@@ -209,3 +223,11 @@ def test_shadow_request_binds_context_digest_to_immutable_commit(tmp_path: Path)
         "producer_commit_sha": "c" * 40,
         "input_digest": "sha256:" + hashlib.sha256(context_path.read_bytes()).hexdigest(),
     }
+
+
+def test_confidence_rejects_nan() -> None:
+    payload = load_example()
+    payload["confidence"] = float("nan")
+
+    with pytest.raises(SignalValidationError, match="finite|between 0 and 1"):
+        validate_signal(payload)
