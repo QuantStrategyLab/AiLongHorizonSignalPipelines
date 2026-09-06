@@ -36,6 +36,27 @@ def parse_date(value: str) -> dt.date:
     return parse_price_date(value)
 
 
+def parse_datetime(value: str) -> dt.datetime:
+    text = str(value).strip()
+    if text.endswith("Z"):
+        text = f"{text[:-1]}+00:00"
+    parsed = dt.datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
+
+
+def decision_datetime_for_date(date: dt.date) -> dt.datetime:
+    # Date-only replay decisions are treated as start-of-day UTC so same-day
+    # after-hours generation cannot affect earlier same-day decisions.
+    return dt.datetime(date.year, date.month, date.day, tzinfo=dt.timezone.utc)
+
+
+def signal_available_at(signal: dict[str, Any]) -> dt.datetime:
+    raw = signal.get("available_at", signal["generated_at"])
+    return parse_datetime(str(raw))
+
+
 def load_price_history(path: Path, *, symbol: str) -> list[PricePoint]:
     rows = [
         PricePoint(date=row.date, close=row.close)
@@ -57,14 +78,35 @@ def load_signals(path: Path) -> list[dict[str, Any]]:
     return signals
 
 
-def signal_active_on(signal: dict[str, Any], date: dt.date) -> bool:
+def signal_active_on(
+    signal: dict[str, Any],
+    date: dt.date,
+    *,
+    decision_time: dt.datetime | None = None,
+) -> bool:
     as_of = parse_date(str(signal["as_of"]))
     expires_at = parse_date(str(signal["expires_at"]))
-    return as_of <= date <= expires_at
+    if not (as_of <= date <= expires_at):
+        return False
+    decision = decision_time if decision_time is not None else decision_datetime_for_date(date)
+    if decision.tzinfo is None:
+        decision = decision.replace(tzinfo=dt.timezone.utc)
+    else:
+        decision = decision.astimezone(dt.timezone.utc)
+    return signal_available_at(signal) <= decision
 
 
-def signal_for_date(signals: list[dict[str, Any]], date: dt.date) -> dict[str, Any] | None:
-    active = [signal for signal in signals if signal_active_on(signal, date)]
+def signal_for_date(
+    signals: list[dict[str, Any]],
+    date: dt.date,
+    *,
+    decision_time: dt.datetime | None = None,
+) -> dict[str, Any] | None:
+    active = [
+        signal
+        for signal in signals
+        if signal_active_on(signal, date, decision_time=decision_time)
+    ]
     return active[-1] if active else None
 
 

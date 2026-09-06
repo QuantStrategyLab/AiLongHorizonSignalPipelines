@@ -1,19 +1,29 @@
 from __future__ import annotations
 
+import copy
 import datetime as dt
+import json
 from pathlib import Path
 
 from research_signal_context_pipelines.overlay_backtest import (
     OverlayPolicy,
+    PricePoint,
     backtest_overlay,
     exposure_for_signal,
     load_price_history,
     load_signals,
+    signal_active_on,
     signal_for_date,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _example_signal(**overrides: object) -> dict:
+    payload = json.loads((ROOT / "examples" / "signal_history" / "2026-02-06.json").read_text(encoding="utf-8"))
+    payload.update(overrides)
+    return payload
 
 
 def test_exposure_for_signal_is_risk_reducing_only() -> None:
@@ -32,6 +42,65 @@ def test_signal_for_date_uses_latest_active_signal() -> None:
     assert signal_for_date(signals, dt.date(2026, 3, 1))["regime"] == "risk_off"
     assert signal_for_date(signals, dt.date(2026, 4, 1))["regime"] == "mixed"
     assert signal_for_date(signals, dt.date(2026, 6, 1)) is None
+
+
+def test_signal_active_on_requires_generated_at_not_after_decision_time() -> None:
+    signal = _example_signal(
+        as_of="2026-02-06",
+        generated_at="2026-02-06T22:00:00Z",
+        expires_at="2026-03-19",
+    )
+    morning = dt.datetime(2026, 2, 6, 15, 0, tzinfo=dt.timezone.utc)
+    after_hours = dt.datetime(2026, 2, 6, 22, 0, tzinfo=dt.timezone.utc)
+
+    assert signal_active_on(signal, dt.date(2026, 2, 6), decision_time=morning) is False
+    assert signal_active_on(signal, dt.date(2026, 2, 6), decision_time=after_hours) is True
+    assert signal_active_on(signal, dt.date(2026, 2, 6)) is False
+    assert signal_for_date([signal], dt.date(2026, 2, 9))["regime"] == "risk_off"
+
+
+def test_signal_active_on_uses_available_at_when_present() -> None:
+    signal = _example_signal(
+        as_of="2026-02-06",
+        generated_at="2026-02-05T12:00:00Z",
+        available_at="2026-02-06T22:00:00Z",
+        expires_at="2026-03-19",
+    )
+    morning = dt.datetime(2026, 2, 6, 15, 0, tzinfo=dt.timezone.utc)
+
+    assert signal_active_on(signal, dt.date(2026, 2, 6), decision_time=morning) is False
+    assert signal_for_date([signal], dt.date(2026, 2, 9)) is not None
+
+
+def test_future_generated_at_does_not_rewrite_earlier_overlay_path() -> None:
+    prices = [
+        PricePoint(date=dt.date(2026, 2, 6), close=100.0),
+        PricePoint(date=dt.date(2026, 2, 13), close=90.0),
+        PricePoint(date=dt.date(2026, 2, 20), close=80.0),
+        PricePoint(date=dt.date(2026, 2, 27), close=70.0),
+    ]
+    known = _example_signal(
+        as_of="2026-02-06",
+        generated_at="2026-02-06T22:00:00Z",
+        expires_at="2026-03-19",
+        regime="risk_off",
+        confidence=0.9,
+        risk_flags=["liquidity_stress"],
+    )
+    future = copy.deepcopy(known)
+    future["generated_at"] = "2026-02-20T22:00:00Z"
+
+    without_signal = backtest_overlay(prices, [])
+    with_future = backtest_overlay(prices, [future])
+    with_known = backtest_overlay(prices, [known])
+
+    # Periods before the future generated_at must match the no-signal path.
+    assert with_future["overlay"]["final_equity"] == without_signal["overlay"]["final_equity"]
+    assert with_future["overlay"]["total_return"] == without_signal["overlay"]["total_return"]
+    assert with_future["overlay"]["avg_exposure"] == without_signal["overlay"]["avg_exposure"]
+    # Once available, an unexpired risk-off signal still reduces exposure vs baseline.
+    assert with_known["overlay"]["avg_exposure"] < without_signal["overlay"]["avg_exposure"]
+    assert with_known["overlay"]["final_equity"] > without_signal["overlay"]["final_equity"]
 
 
 def test_backtest_overlay_reduces_drawdown_on_synthetic_path() -> None:
