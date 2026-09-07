@@ -4,12 +4,47 @@ import datetime as dt
 import json
 import importlib.util
 import sys
+import io
+from email.message import Message
+import urllib.request
+from urllib.response import addinfourl
 
 import pytest
 from pathlib import Path
 
 from research_signal_context_pipelines.research_context_adapter import ResearchContextAdapter
 from research_signal_context_pipelines import research_context_adapter as adapter_module
+
+
+@pytest.mark.parametrize("status", [301, 302, 303, 307, 308])
+@pytest.mark.parametrize("target", [
+    "https://outside.example/private", "https://synthetic.example/another-path",
+    "http://127.0.0.1/private", "http://synthetic.example/downgrade",
+])
+def test_redirect_is_stopped_before_any_target_request(tmp_path, monkeypatch, status, target):
+    calls = []
+
+    def https_open(_handler, request):
+        calls.append(request.full_url)
+        headers = Message()
+        headers["Content-Type"] = "application/rss+xml"
+        if len(calls) == 1:
+            headers["Location"] = target
+        response = addinfourl(
+            io.BytesIO(_rss("2026-09-04T00:00:00Z").encode()), headers,
+            request.full_url, status if len(calls) == 1 else 200,
+        )
+        response.msg = "synthetic response"
+        return response
+
+    monkeypatch.setattr(urllib.request.HTTPSHandler, "https_open", https_open)
+    monkeypatch.setattr(urllib.request.HTTPHandler, "http_open", https_open)
+    monkeypatch.setattr(urllib.request, "_opener", None)
+    context = ResearchContextAdapter(_config(tmp_path)).build_context()
+    assert calls == ["https://synthetic.example/source"]
+    assert context["source_count"] == 0
+    assert context["research_sources"] == []
+    assert any("failed to fetch" in warning for warning in context["warnings"])
 
 
 @pytest.fixture(autouse=True)
