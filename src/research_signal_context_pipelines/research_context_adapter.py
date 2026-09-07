@@ -10,13 +10,22 @@ from pathlib import Path
 from typing import Any
 from urllib.error import URLError
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 from xml.etree import ElementTree as ET
 
 
 DEFAULT_WEB_RESEARCH_TIMEOUT_SECONDS = 10.0
 DEFAULT_WEB_RESEARCH_MAX_ENTRIES = 8
 WEB_RESEARCH_USER_AGENT = "Mozilla/5.0"
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        # Only the configured URL was admitted; no follow-up request is allowed.
+        return None
+
+
+urlopen = build_opener(_NoRedirect()).open
 
 
 @dataclass(frozen=True)
@@ -294,7 +303,7 @@ class ResearchContextAdapter:
                 fetched_time = dt.datetime.now(dt.timezone.utc)
                 fetched_at = _isoformat_utc(fetched_time)
             except (OSError, URLError, TimeoutError, ValueError) as exc:
-                warnings.append(f"failed to fetch research source {source.url}: {type(exc).__name__}: {exc}")
+                warnings.append(f"failed to fetch research source: {type(exc).__name__}")
                 continue
 
             if cutoff is not None and fetched_time > cutoff:
